@@ -57,7 +57,7 @@ const generateKey = () => {
         }
         return result;
     };
-    return `kzm-${gen(8)}-${gen(8)}`;
+    return `dwk-${gen(8)}-${gen(8)}`;
 };
 
 module.exports = { authHandler, generateKey };
