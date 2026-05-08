@@ -30,7 +30,7 @@ if (mongoose.connection.readyState === 0) {
       .catch(err => console.error('❌ Error MongoDB:', err));
 }
 
-// Esquema para usuarios (con verificación)
+// Esquema para usuarios (con verificación y VIP)
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
@@ -48,7 +48,7 @@ const userSchema = new mongoose.Schema({
     verified: { type: Boolean, default: false },
     verificationCode: { type: String, default: null },
     verificationExpires: { type: Date, default: null },
-    // VIP
+    // Campos VIP
     vipSince: { type: Date, default: null },
     vipExpires: { type: Date, default: null }
 });
@@ -60,6 +60,20 @@ let startTime = Date.now();
 // Generar código de verificación (6 dígitos)
 function generarCodigo() {
     return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// ============== FUNCIÓN PARA VERIFICAR EXPIRACIÓN VIP ==============
+async function verificarExpiracion(user) {
+    if (user.vipExpires && new Date() > new Date(user.vipExpires)) {
+        user.role = 'user';
+        user.plan = 'free';
+        user.limit = 100;
+        user.vipSince = null;
+        user.vipExpires = null;
+        await user.save();
+        return true;
+    }
+    return false;
 }
 
 // ============== REGISTRO (con verificación) ==============
@@ -142,7 +156,7 @@ router.post('/verify', async (req, res) => {
         user.verificationExpires = null;
         await user.save();
 
-        res.json({ status: true, message: "Cuenta verificada exitosamente" });
+        res.json({ status: true, message: "Cuenta verificada exitosamente. Ya puedes iniciar sesión." });
     } catch (err) {
         console.error(err);
         res.status(500).json({ status: false, message: "Error interno" });
@@ -179,11 +193,12 @@ router.post('/resend-code', async (req, res) => {
 
         res.json({ status: true, message: "Código reenviado a tu correo" });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ status: false, message: "Error interno" });
     }
 });
 
-// ============== LOGIN (solo usuarios verificados) ==============
+// ============== LOGIN ==============
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
@@ -224,6 +239,9 @@ router.post('/login', async (req, res) => {
             });
         }
 
+        // Verificar si expiró el plan VIP
+        await verificarExpiracion(user);
+
         res.json({
             status: true,
             creator: "DvWilkerOFC",
@@ -243,6 +261,245 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// ============== (EL RESTO DE LAS RUTAS: me, update-profile, stats, dashboard-global, admin/all, etc. se mantienen igual) ==============
+// ============== OBTENER MI PERFIL ==============
+router.get('/me', async (req, res) => {
+    const { apiKey } = req.query;
+    if (!apiKey) return res.status(400).json({ status: false, message: "ApiKey requerida" });
+
+    try {
+        if (adminUser && apiKey === adminUser.key) {
+            return res.json({
+                status: true,
+                creator: "DvWilkerOFC",
+                data: {
+                    username: adminUser.username,
+                    email: adminUser.email,
+                    key: adminUser.key,
+                    role: "admin",
+                    plan: "ADMIN VIP",
+                    profile_img: adminUser.profile_img || "https://raw.githubusercontent.com/dvwilker/gohan-storage/main/1778169562859-IMG-20260504-WA0386.jpg",
+                    requests: {
+                        today: adminUser.requestToday || 0,
+                        total: adminUser.totalRequest || 0,
+                        limit: adminUser.limit || 100000,
+                        remaining: (adminUser.limit || 100000) - (adminUser.requestToday || 0)
+                    }
+                }
+            });
+        }
+
+        let user = await User.findOne({ key: apiKey });
+        if (!user) return res.status(404).json({ status: false, message: "Usuario no encontrado" });
+
+        await verificarExpiracion(user);
+
+        // Calcular días restantes si es VIP
+        let daysLeft = 0;
+        if (user.vipExpires) {
+            daysLeft = Math.ceil((new Date(user.vipExpires) - new Date()) / (1000 * 60 * 60 * 24));
+        }
+
+        res.json({
+            status: true,
+            creator: "DvWilkerOFC",
+            data: {
+                username: user.username,
+                email: user.email,
+                key: user.key,
+                role: user.role,
+                plan: user.plan,
+                profile_img: user.profile_img,
+                verified: user.verified,
+                vipExpires: user.vipExpires,
+                daysLeft: daysLeft,
+                requests: {
+                    today: user.requestToday,
+                    total: user.totalRequest,
+                    limit: user.limit,
+                    remaining: user.limit - user.requestToday
+                }
+            }
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ status: false, message: "Error interno" });
+    }
+});
+
+// ============== ACTUALIZAR PERFIL ==============
+router.post('/update-profile', async (req, res) => {
+    const { apiKey, type, value } = req.body;
+
+    if (!apiKey || !type || value === undefined) {
+        return res.status(400).json({ status: false, message: "Faltan parámetros" });
+    }
+
+    try {
+        if (adminUser && apiKey === adminUser.key) {
+            return res.status(403).json({ status: false, message: "El admin solo se modifica manualmente en users.json" });
+        }
+
+        const user = await User.findOne({ key: apiKey });
+        if (!user) {
+            return res.status(404).json({ status: false, message: "Llave maestra inválida" });
+        }
+
+        const allowedFields = ['username', 'email', 'password', 'profile_img'];
+        if (!allowedFields.includes(type)) {
+            return res.status(400).json({ status: false, message: "Acción no permitida para este campo" });
+        }
+
+        user[type] = value;
+        await user.save();
+
+        res.json({ status: true, message: "Protocolo actualizado", field: type });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ status: false, message: "Error interno" });
+    }
+});
+
+// ============== ESTADÍSTICAS ==============
+router.get('/stats', async (req, res) => {
+    try {
+        const mongoUsers = await User.countDocuments();
+        const totalUsers = mongoUsers + (adminUser ? 1 : 0);
+        res.json({ status: true, users: totalUsers, endpoints: 50 });
+    } catch (err) {
+        res.status(500).json({ status: false });
+    }
+});
+
+// ============== DASHBOARD GLOBAL ==============
+router.get('/dashboard-global', async (req, res) => {
+    try {
+        const mongoUsers = await User.countDocuments();
+        const totalUsers = mongoUsers + (adminUser ? 1 : 0);
+
+        let topUsersMongo = await User.find({ totalRequest: { $gt: 0 } })
+            .sort({ totalRequest: -1 })
+            .limit(5);
+
+        let topUsers = topUsersMongo.map(u => ({
+            username: u.username,
+            total: u.totalRequest,
+            initial: u.username.charAt(0).toUpperCase()
+        }));
+
+        if (adminUser && adminUser.totalRequest > 0 && topUsers.length < 5) {
+            topUsers.push({
+                username: adminUser.username,
+                total: adminUser.totalRequest,
+                initial: adminUser.username.charAt(0).toUpperCase()
+            });
+            topUsers.sort((a, b) => b.total - a.total);
+        }
+
+        const globalRequestsResult = await User.aggregate([
+            { $group: { _id: null, total: { $sum: "$totalRequest" } } }
+        ]);
+        let globalRequests = globalRequestsResult[0]?.total || 0;
+        if (adminUser && adminUser.totalRequest) globalRequests += adminUser.totalRequest;
+
+        res.json({ status: true, totalUsers, globalRequests, uptime: startTime, top5: topUsers });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ status: false });
+    }
+});
+
+// ============== ADMIN: VER TODOS ==============
+router.get('/admin/all', async (req, res) => {
+    const { apiKey } = req.query;
+
+    try {
+        let isAdmin = false;
+        if (adminUser && apiKey === adminUser.key) {
+            isAdmin = true;
+        } else {
+            const adminCheck = await User.findOne({ key: apiKey, role: 'admin' });
+            isAdmin = !!adminCheck;
+        }
+
+        if (!isAdmin) return res.status(403).json({ status: false, message: "No autorizado" });
+
+        const mongoUsers = await User.find({});
+        if (adminUser) {
+            mongoUsers.unshift({
+                username: adminUser.username,
+                email: adminUser.email,
+                key: adminUser.key,
+                role: 'admin',
+                plan: 'ADMIN VIP',
+                limit: adminUser.limit,
+                totalRequest: adminUser.totalRequest || 0
+            });
+        }
+
+        res.json({ status: true, users: mongoUsers });
+    } catch (err) {
+        res.status(500).json({ status: false });
+    }
+});
+
+// ============== ADMIN: ACTUALIZAR ==============
+router.post('/admin/update', async (req, res) => {
+    const { adminKey, targetEmail, newData } = req.body;
+
+    try {
+        let isAdmin = false;
+        if (adminUser && adminKey === adminUser.key) {
+            isAdmin = true;
+        } else {
+            const adminCheck = await User.findOne({ key: adminKey, role: 'admin' });
+            isAdmin = !!adminCheck;
+        }
+
+        if (!isAdmin) return res.status(403).json({ status: false });
+
+        if (adminUser && targetEmail === adminUser.email) {
+            return res.status(403).json({ status: false, message: "No se puede modificar el admin desde aquí" });
+        }
+
+        const result = await User.updateOne({ email: targetEmail }, { $set: newData });
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ status: false });
+        }
+
+        res.json({ status: true });
+    } catch (err) {
+        res.status(500).json({ status: false });
+    }
+});
+
+// ============== ADMIN: ELIMINAR ==============
+router.post('/admin/delete', async (req, res) => {
+    const { adminKey, targetEmail } = req.body;
+
+    try {
+        let isAdmin = false;
+        if (adminUser && adminKey === adminUser.key) {
+            isAdmin = true;
+        } else {
+            const adminCheck = await User.findOne({ key: adminKey, role: 'admin' });
+            isAdmin = !!adminCheck;
+        }
+
+        if (!isAdmin) return res.status(403).json({ status: false });
+
+        if (adminUser && targetEmail === adminUser.email) {
+            return res.status(403).json({ status: false, message: "No se puede eliminar el admin" });
+        }
+
+        const result = await User.deleteOne({ email: targetEmail });
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ status: false });
+        }
+
+        res.json({ status: true });
+    } catch (err) {
+        res.status(500).json({ status: false });
+    }
+});
 
 module.exports = router;
