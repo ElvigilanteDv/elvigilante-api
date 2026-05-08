@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
 const { generateKey } = require('../middlewares/auth');
-const { enviarCodigoVerificacion } = require('../middlewares/email');
 
 // ============== CONFIGURACIÓN ==============
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://DvWilkerOFC:dvwilker15@dvwilker15.xndilqb.mongodb.net/?appName=dvwilker15';
@@ -30,7 +29,7 @@ if (mongoose.connection.readyState === 0) {
       .catch(err => console.error('❌ Error MongoDB:', err));
 }
 
-// Esquema para usuarios (con verificación y VIP)
+// Esquema para usuarios
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
@@ -44,11 +43,6 @@ const userSchema = new mongoose.Schema({
     profile_img: { type: String, default: 'https://raw.githubusercontent.com/dvwilker/gohan-storage/main/1778169562859-IMG-20260504-WA0386.jpg' },
     lastRequestDate: { type: String, default: () => new Date().toISOString().split('T')[0] },
     createdAt: { type: Date, default: Date.now },
-    // Verificación de correo
-    verified: { type: Boolean, default: false },
-    verificationCode: { type: String, default: null },
-    verificationExpires: { type: Date, default: null },
-    // Campos VIP
     vipSince: { type: Date, default: null },
     vipExpires: { type: Date, default: null }
 });
@@ -57,12 +51,7 @@ const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 let startTime = Date.now();
 
-// Generar código de verificación (6 dígitos)
-function generarCodigo() {
-    return Math.floor(100000 + Math.random() * 900000).toString();
-}
-
-// ============== FUNCIÓN PARA VERIFICAR EXPIRACIÓN VIP ==============
+// ============== FUNCIÓN PARA VERIFICAR EXPIRACIÓN ==============
 async function verificarExpiracion(user) {
     if (user.vipExpires && new Date() > new Date(user.vipExpires)) {
         user.role = 'user';
@@ -76,7 +65,7 @@ async function verificarExpiracion(user) {
     return false;
 }
 
-// ============== REGISTRO (con verificación) ==============
+// ============== REGISTRO ==============
 router.post('/register', async (req, res) => {
     const { username, email, password } = req.body;
 
@@ -94,9 +83,6 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ status: false, message: "El correo o usuario ya existe" });
         }
 
-        const codigo = generarCodigo();
-        const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutos
-
         const newUser = new User({
             username,
             email,
@@ -107,94 +93,14 @@ router.post('/register', async (req, res) => {
             limit: 100,
             requestToday: 0,
             totalRequest: 0,
-            lastRequestDate: new Date().toISOString().split('T')[0],
-            verified: false,
-            verificationCode: codigo,
-            verificationExpires: expiresAt
+            lastRequestDate: new Date().toISOString().split('T')[0]
         });
 
         await newUser.save();
-
-        // Enviar correo de verificación
-        const emailResult = await enviarCodigoVerificacion(email, codigo);
-
-        res.json({
-            status: true,
-            creator: "Félix Ofc",
-            message: "Registro exitoso. Revisa tu correo para verificar tu cuenta.",
-            key: newUser.key,
-            verified: false,
-            emailSent: emailResult.success
-        });
+        res.json({ status: true, creator: "Félix Ofc", message: "Registro exitoso", key: newUser.key });
     } catch (err) {
         console.error(err);
         res.status(500).json({ status: false, message: "Error en el servidor durante el registro" });
-    }
-});
-
-// ============== VERIFICAR CUENTA ==============
-router.post('/verify', async (req, res) => {
-    const { email, code } = req.body;
-
-    if (!email || !code) {
-        return res.status(400).json({ status: false, message: "Email y código requeridos" });
-    }
-
-    try {
-        const user = await User.findOne({ email, verificationCode: code });
-        
-        if (!user) {
-            return res.status(400).json({ status: false, message: "Código inválido" });
-        }
-
-        if (new Date() > new Date(user.verificationExpires)) {
-            return res.status(400).json({ status: false, message: "El código ha expirado. Solicita uno nuevo." });
-        }
-
-        user.verified = true;
-        user.verificationCode = null;
-        user.verificationExpires = null;
-        await user.save();
-
-        res.json({ status: true, message: "Cuenta verificada exitosamente. Ya puedes iniciar sesión." });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ status: false, message: "Error interno" });
-    }
-});
-
-// ============== REENVIAR CÓDIGO ==============
-router.post('/resend-code', async (req, res) => {
-    const { email } = req.body;
-
-    if (!email) {
-        return res.status(400).json({ status: false, message: "Email requerido" });
-    }
-
-    try {
-        const user = await User.findOne({ email });
-        
-        if (!user) {
-            return res.status(404).json({ status: false, message: "Usuario no encontrado" });
-        }
-
-        if (user.verified) {
-            return res.status(400).json({ status: false, message: "La cuenta ya está verificada" });
-        }
-
-        const nuevoCodigo = generarCodigo();
-        const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-
-        user.verificationCode = nuevoCodigo;
-        user.verificationExpires = expiresAt;
-        await user.save();
-
-        await enviarCodigoVerificacion(email, nuevoCodigo);
-
-        res.json({ status: true, message: "Código reenviado a tu correo" });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ status: false, message: "Error interno" });
     }
 });
 
@@ -230,16 +136,6 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ status: false, message: "Credenciales incorrectas" });
         }
 
-        // Verificar si la cuenta está verificada
-        if (!user.verified) {
-            return res.status(403).json({ 
-                status: false, 
-                message: "Cuenta no verificada. Revisa tu correo o solicita un nuevo código.",
-                verified: false
-            });
-        }
-
-        // Verificar si expiró el plan VIP
         await verificarExpiracion(user);
 
         res.json({
@@ -293,7 +189,6 @@ router.get('/me', async (req, res) => {
 
         await verificarExpiracion(user);
 
-        // Calcular días restantes si es VIP
         let daysLeft = 0;
         if (user.vipExpires) {
             daysLeft = Math.ceil((new Date(user.vipExpires) - new Date()) / (1000 * 60 * 60 * 24));
@@ -309,8 +204,6 @@ router.get('/me', async (req, res) => {
                 role: user.role,
                 plan: user.plan,
                 profile_img: user.profile_img,
-                verified: user.verified,
-                vipExpires: user.vipExpires,
                 daysLeft: daysLeft,
                 requests: {
                     today: user.requestToday,
