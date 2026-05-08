@@ -7,7 +7,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.google.com/recaptcha/api.js?render=6Lfw-dwsAAAAACc6y5K4sfFnplSqbskYPia1ADh5"></script>
 
     <style>
         :root { 
@@ -26,7 +25,6 @@
             --text-muted: #636366;
         }
 
-        /* Bloqueo de pantalla negra inicial */
         #safety-block {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 10000; display: block;
@@ -54,13 +52,19 @@
         body.light-mode .input-kazuma { background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.1); }
         .input-kazuma:focus { border-color: var(--neon-blue); outline: none; }
 
-        .btn-blue { background: var(--neon-blue); color: #000; font-weight: 900; }
-        
-        .grecaptcha-badge { 
-            width: 70px !important; overflow: hidden !important; transition: 0.3s !important;
-            right: 0px !important; bottom: 20px !important; z-index: 9999 !important;
+        .btn-blue { background: var(--neon-blue); color: #000; font-weight: 900; cursor: pointer; }
+        .btn-pay { background: #0070ba; color: white; border: none; padding: 8px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-pay:hover { background: #005c9e; transform: scale(1.02); }
+
+        .plan-card { 
+            background: linear-gradient(135deg, rgba(0,243,255,0.1), rgba(0,0,0,0.2)); 
+            border-radius: 20px; 
+            padding: 15px; 
+            margin-bottom: 15px;
+            border: 1px solid rgba(0,243,255,0.2);
+            transition: 0.3s;
         }
-        .grecaptcha-badge:hover { width: 256px !important; }
+        .plan-card:hover { transform: translateY(-3px); border-color: var(--neon-blue); }
 
         header { background: rgba(12, 12, 20, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(0, 243, 255, 0.1); }
         body.light-mode header { background: rgba(255, 255, 255, 0.85); border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
@@ -84,6 +88,7 @@
     </header>
 
     <main class="container mx-auto p-4 max-w-2xl">
+        <!-- INFO USUARIO -->
         <div class="glass rounded-[32px] p-8 mt-6 text-center">
             <img id="view-img" src="https://files.catbox.moe/9ssbf9.jpg" class="mx-auto w-[120px] h-[120px] rounded-full border-2 border-[var(--neon-blue)] object-cover" alt="Avatar">
             <h2 id="view-username" class="text-2xl font-black mt-4 uppercase">---</h2>
@@ -101,6 +106,75 @@
             </div>
         </div>
 
+        <!-- SECCIÓN DE PLANES VIP -->
+        <div class="glass rounded-[32px] p-8 mt-8">
+            <h3 class="text-sm font-black mb-6 uppercase flex items-center gap-2">
+                <i class="fas fa-crown" style="color: gold;"></i> Mejora tu Plan
+            </h3>
+            
+            <!-- VIP - $1 USD -->
+            <div class="plan-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                    <div>
+                        <h3 class="text-xl font-black">💎 VIP</h3>
+                        <p class="text-sm text-slate-400">1,300 solicitudes / día</p>
+                        <p class="text-xs text-slate-500">⏱️ 33 días de duración</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="text-2xl font-bold text-green-400">$1 USD</div>
+                        <button onclick="comprarPlan('vip')" class="btn-pay mt-2"><i class="fab fa-paypal"></i> Comprar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PRO - $2 USD -->
+            <div class="plan-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                    <div>
+                        <h3 class="text-xl font-black">⚡ PRO</h3>
+                        <p class="text-sm text-slate-400">2,500 solicitudes / día</p>
+                        <p class="text-xs text-slate-500">⏱️ 33 días de duración</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="text-2xl font-bold text-green-400">$2 USD</div>
+                        <button onclick="comprarPlan('pro')" class="btn-pay mt-2"><i class="fab fa-paypal"></i> Comprar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PREMIUM - $4 USD -->
+            <div class="plan-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                    <div>
+                        <h3 class="text-xl font-black">👑 PREMIUM</h3>
+                        <p class="text-sm text-slate-400">400,000 solicitudes / día</p>
+                        <p class="text-xs text-slate-500">⏱️ 50 días de duración</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="text-2xl font-bold text-green-400">$4 USD</div>
+                        <button onclick="comprarPlan('premium')" class="btn-pay mt-2"><i class="fab fa-paypal"></i> Comprar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADMIN - $6 USD (con selector de cantidad) -->
+            <div class="plan-card" style="background: linear-gradient(135deg, rgba(128,0,255,0.15), rgba(0,0,0,0.2));">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                    <div>
+                        <h3 class="text-xl font-black">🔥 ADMIN</h3>
+                        <p class="text-sm text-slate-400">¡Tú eliges la cantidad!</p>
+                        <p class="text-xs text-slate-500">⏱️ 33 días de duración</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="text-2xl font-bold text-green-400">$6 USD</div>
+                        <input type="number" id="customLimit" placeholder="Cantidad" min="100" style="background: rgba(0,0,0,0.5); border: 1px solid var(--neon-blue); border-radius: 10px; padding: 8px; width: 100px; margin-top: 5px; color: white;">
+                        <button onclick="comprarPlanAdmin()" class="btn-pay mt-2" style="background: linear-gradient(45deg, purple, blue);"><i class="fab fa-paypal"></i> Comprar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDITAR DATOS -->
         <div class="glass rounded-[32px] p-8 mt-8">
             <h3 class="text-sm font-black mb-6 uppercase">Editar Datos</h3>
             <div class="space-y-6">
@@ -146,18 +220,8 @@
     </main>
 
     <script>
-        // EJECUCIÓN INMEDIATA: Bloqueo de seguridad
         const userData = JSON.parse(localStorage.getItem('kazuma_user'));
-        if (!userData) {
-            window.location.href = '/login';
-        } else {
-            // Si hay usuario, quitamos el negro después de un breve momento
-            document.addEventListener("DOMContentLoaded", () => {
-                setTimeout(() => {
-                    document.getElementById('safety-block').style.display = 'none';
-                }, 300);
-            });
-        }
+        if (!userData) window.location.href = '/login';
 
         function toggleTheme() {
             const body = document.body;
@@ -172,10 +236,6 @@
         async function loadProfile() {
             if (localStorage.getItem('dvwilker-theme') === 'light') toggleTheme();
 
-            grecaptcha.ready(() => {
-                grecaptcha.execute('6Lfw-dwsAAAAACc6y5K4sfFnplSqbskYPia1ADh5', {action: 'profile_load'});
-            });
-
             try {
                 const res = await fetch(`/api/auth/me?apiKey=${userData.key}`);
                 const result = await res.json();
@@ -189,6 +249,7 @@
                     if (u.profile_img) document.getElementById('view-img').src = u.profile_img;
                 }
             } catch (e) { console.error("Error de red"); }
+            document.getElementById('safety-block').style.display = 'none';
         }
 
         async function updateData(type) {
@@ -220,7 +281,85 @@
 
         function logout() { localStorage.clear(); window.location.href = '/login'; }
 
-        window.onload = loadProfile;
+        // ============== FUNCIONES DE COMPRA ==============
+        async function comprarPlan(plan) {
+            Swal.fire({ title: 'Procesando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            
+            try {
+                const response = await fetch('/api/payments/create-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ apiKey: userData.key, plan: plan })
+                });
+                
+                const order = await response.json();
+                if (order.id) {
+                    window.location.href = `https://www.sandbox.paypal.com/checkoutnow?token=${order.id}`;
+                } else {
+                    Swal.fire('Error', 'No se pudo crear la orden', 'error');
+                }
+            } catch (err) {
+                Swal.fire('Error', 'Error de conexión', 'error');
+            }
+        }
+
+        async function comprarPlanAdmin() {
+            const customLimit = document.getElementById('customLimit').value;
+            
+            if (!customLimit || customLimit < 100) {
+                Swal.fire('Error', 'Ingresa una cantidad válida (mínimo 100)', 'error');
+                return;
+            }
+            
+            Swal.fire({ title: 'Procesando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            
+            try {
+                const response = await fetch('/api/payments/create-admin-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ apiKey: userData.key, customLimit: parseInt(customLimit) })
+                });
+                
+                const order = await response.json();
+                if (order.id) {
+                    window.location.href = `https://www.sandbox.paypal.com/checkoutnow?token=${order.id}`;
+                } else {
+                    Swal.fire('Error', order.error || 'No se pudo crear la orden', 'error');
+                }
+            } catch (err) {
+                Swal.fire('Error', 'Error de conexión', 'error');
+            }
+        }
+
+        // Verificar pago al volver
+        async function verificarPago() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            const PayerID = urlParams.get('PayerID');
+            
+            if (token && PayerID) {
+                Swal.fire({ title: 'Verificando pago...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                
+                const res = await fetch('/api/payments/capture-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderId: token, apiKey: userData.key })
+                });
+                
+                const data = await res.json();
+                
+                if (data.status) {
+                    Swal.fire({ title: '🎉 PAGO EXITOSO', text: data.message, icon: 'success' }).then(() => location.reload());
+                } else {
+                    Swal.fire('Error', data.error || 'Error al verificar pago', 'error');
+                }
+            }
+        }
+
+        window.onload = () => {
+            loadProfile();
+            verificarPago();
+        };
     </script>
 </body>
 </html>
