@@ -29,7 +29,7 @@ if (mongoose.connection.readyState === 0) {
       .catch(err => console.error('❌ Error MongoDB:', err));
 }
 
-// Esquema para usuarios normales (con campos VIP)
+// Esquema para usuarios
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
@@ -43,7 +43,6 @@ const userSchema = new mongoose.Schema({
     profile_img: { type: String, default: 'https://raw.githubusercontent.com/dvwilker/gohan-storage/main/1778169562859-IMG-20260504-WA0386.jpg' },
     lastRequestDate: { type: String, default: () => new Date().toISOString().split('T')[0] },
     createdAt: { type: Date, default: Date.now },
-    // NUEVOS CAMPOS PARA VIP
     vipSince: { type: Date, default: null },
     vipExpires: { type: Date, default: null }
 });
@@ -137,7 +136,6 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ status: false, message: "Credenciales incorrectas" });
         }
 
-        // Verificar si expiró el plan
         await verificarExpiracion(user);
 
         res.json({
@@ -191,7 +189,6 @@ router.get('/me', async (req, res) => {
 
         await verificarExpiracion(user);
 
-        // Calcular días restantes si es VIP
         let daysLeft = 0;
         if (user.vipExpires) {
             daysLeft = Math.ceil((new Date(user.vipExpires) - new Date()) / (1000 * 60 * 60 * 24));
@@ -223,12 +220,21 @@ router.get('/me', async (req, res) => {
     }
 });
 
-// ============== ACTUALIZAR PERFIL ==============
+// ============== ACTUALIZAR PERFIL (PROTEGIDO) ==============
 router.post('/update-profile', async (req, res) => {
     const { apiKey, type, value } = req.body;
 
     if (!apiKey || !type || value === undefined) {
         return res.status(400).json({ status: false, message: "Faltan parámetros" });
+    }
+
+    // 🚫 BLOQUEAR CAMPOS PROHIBIDOS - SOLO ADMIN PUEDE CAMBIAR ESTO
+    const forbiddenFields = ['role', 'plan', 'limit', 'vipSince', 'vipExpires', 'totalRequest', 'requestToday', 'key', 'verified'];
+    if (forbiddenFields.includes(type)) {
+        return res.status(403).json({ 
+            status: false, 
+            message: "No puedes modificar este campo. Solo el administrador puede cambiar roles y planes." 
+        });
     }
 
     try {
@@ -241,6 +247,7 @@ router.post('/update-profile', async (req, res) => {
             return res.status(404).json({ status: false, message: "Llave maestra inválida" });
         }
 
+        // Solo permitir editar estos campos básicos
         const allowedFields = ['username', 'email', 'password', 'profile_img'];
         if (!allowedFields.includes(type)) {
             return res.status(400).json({ status: false, message: "Acción no permitida para este campo" });
