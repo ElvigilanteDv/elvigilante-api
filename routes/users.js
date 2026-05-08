@@ -29,7 +29,7 @@ if (mongoose.connection.readyState === 0) {
       .catch(err => console.error('❌ Error MongoDB:', err));
 }
 
-// Esquema para usuarios
+// Esquema para usuarios normales (con campos VIP)
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
@@ -43,6 +43,7 @@ const userSchema = new mongoose.Schema({
     profile_img: { type: String, default: 'https://raw.githubusercontent.com/dvwilker/gohan-storage/main/1778169562859-IMG-20260504-WA0386.jpg' },
     lastRequestDate: { type: String, default: () => new Date().toISOString().split('T')[0] },
     createdAt: { type: Date, default: Date.now },
+    // NUEVOS CAMPOS PARA VIP
     vipSince: { type: Date, default: null },
     vipExpires: { type: Date, default: null }
 });
@@ -136,6 +137,7 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ status: false, message: "Credenciales incorrectas" });
         }
 
+        // Verificar si expiró el plan
         await verificarExpiracion(user);
 
         res.json({
@@ -189,6 +191,7 @@ router.get('/me', async (req, res) => {
 
         await verificarExpiracion(user);
 
+        // Calcular días restantes si es VIP
         let daysLeft = 0;
         if (user.vipExpires) {
             daysLeft = Math.ceil((new Date(user.vipExpires) - new Date()) / (1000 * 60 * 60 * 24));
@@ -204,6 +207,7 @@ router.get('/me', async (req, res) => {
                 role: user.role,
                 plan: user.plan,
                 profile_img: user.profile_img,
+                vipExpires: user.vipExpires,
                 daysLeft: daysLeft,
                 requests: {
                     today: user.requestToday,
