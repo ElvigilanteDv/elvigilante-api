@@ -1,15 +1,41 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
-const path = require('path');
+const mongoose = require('mongoose');
 const { generateKey } = require('../middlewares/auth');
 
-const dbPath = path.join(__dirname, '../database/users.json');
-let startTime = Date.now();
+// ✅ TU CADENA DE CONEXIÓN
+const MONGODB_URI = 'mongodb+srv://zenith_agent:rx2CSutif3hgsjcy@dbzenithapi.sio7jth.mongodb.net/?appName=DBZenithAPI';
+const MONGODB_DB = 'wilker_api';
 
-const getUsers = () => JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
-const saveUsers = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
+// Conectar a MongoDB solo si no está conectado
+if (mongoose.connection.readyState === 0) {
+    mongoose.connect(`${MONGODB_URI}/${MONGODB_DB}`, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }).then(() => console.log('✅ Conectado a MongoDB Atlas'))
+      .catch(err => console.error('❌ Error MongoDB:', err));
+}
 
+// 📌 Definir el esquema del Usuario
+const userSchema = new mongoose.Schema({
+    username: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    key: { type: String, required: true, unique: true },
+    role: { type: String, default: 'user' },
+    plan: { type: String, default: 'free' },
+    limit: { type: Number, default: 100 },
+    requestToday: { type: Number, default: 0 },
+    totalRequest: { type: Number, default: 0 },
+    profile_img: { type: String, default: 'https://raw.githubusercontent.com/dvwilker/gohan-storage/main/1778169562859-IMG-20260504-WA0386.jpg' },
+    lastRequestDate: { type: String, default: () => new Date().toISOString().split('T')[0] },
+    createdAt: { type: Date, default: Date.now }
+});
+
+// 📌 Crear el modelo (si ya existe, lo reusa)
+const User = mongoose.models.User || mongoose.model('User', userSchema);
+
+// ============== REGISTRO ==============
 router.post('/register', async (req, res) => {
     const { username, email, password } = req.body;
 
@@ -18,12 +44,13 @@ router.post('/register', async (req, res) => {
     }
 
     try {
-        let users = getUsers();
-        if (users.find(u => u.email === email)) {
-            return res.status(400).json({ status: false, message: "El correo ya existe" });
+        // Verificar si ya existe
+        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+        if (existingUser) {
+            return res.status(400).json({ status: false, message: "El correo o usuario ya existe" });
         }
 
-        const newUser = {
+        const newUser = new User({
             username,
             email,
             password,
@@ -33,19 +60,20 @@ router.post('/register', async (req, res) => {
             limit: 100,
             requestToday: 0,
             totalRequest: 0,
-            profile_img: "https://raw.githubusercontent.com/dvwilker/gohan-storage/main/1778169562859-IMG-20260504-WA0386.jpg", 
+            profile_img: "https://raw.githubusercontent.com/dvwilker/gohan-storage/main/1778169562859-IMG-20260504-WA0386.jpg",
             lastRequestDate: new Date().toISOString().split('T')[0]
-        };
+        });
 
-        users.push(newUser);
-        saveUsers(users);
+        await newUser.save();
 
         res.json({ status: true, creator: "Félix Ofc", message: "Registro exitoso", key: newUser.key });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ status: false, message: "Error en el servidor durante el registro" });
     }
 });
 
+// ============== LOGIN ==============
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
@@ -54,8 +82,7 @@ router.post('/login', async (req, res) => {
     }
 
     try {
-        let users = getUsers();
-        const user = users.find(u => u.email === email && u.password === password);
+        const user = await User.findOne({ email, password });
 
         if (!user) {
             return res.status(401).json({ status: false, message: "Credenciales incorrectas" });
@@ -71,142 +98,171 @@ router.post('/login', async (req, res) => {
                 role: user.role,
                 plan: user.plan,
                 limit: user.limit,
-                profileImg: user.profile_img || "https://raw.githubusercontent.com/dvwilker/gohan-storage/main/1778169562859-IMG-20260504-WA0386.jpg"
+                profileImg: user.profile_img
             }
         });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ status: false, message: "Error interno en el servidor" });
     }
 });
 
-router.get('/me', (req, res) => {
+// ============== OBTENER MI PERFIL ==============
+router.get('/me', async (req, res) => {
     const { apiKey } = req.query;
     if (!apiKey) return res.status(400).json({ status: false, message: "ApiKey requerida" });
 
-    let users = getUsers();
-    const user = users.find(u => u.key === apiKey);
-    if (!user) return res.status(404).json({ status: false, message: "Usuario no encontrado" });
+    try {
+        const user = await User.findOne({ key: apiKey });
+        if (!user) return res.status(404).json({ status: false, message: "Usuario no encontrado" });
 
-    res.json({
-        status: true,
-        creator: "DvWilkerOFC",
-        data: {
-            username: user.username,
-            email: user.email,
-            key: user.key,
-            role: user.role,
-            plan: user.plan,
-            profile_img: user.profile_img || "https://raw.githubusercontent.com/dvwilker/gohan-storage/main/1778169562859-IMG-20260504-WA0386.jpg",
-            requests: {
-                today: user.requestToday,
-                total: user.totalRequest,
-                limit: user.limit,
-                remaining: user.limit - user.requestToday
+        res.json({
+            status: true,
+            creator: "DvWilkerOFC",
+            data: {
+                username: user.username,
+                email: user.email,
+                key: user.key,
+                role: user.role,
+                plan: user.plan,
+                profile_img: user.profile_img,
+                requests: {
+                    today: user.requestToday,
+                    total: user.totalRequest,
+                    limit: user.limit,
+                    remaining: user.limit - user.requestToday
+                }
             }
-        }
-    });
+        });
+    } catch (err) {
+        res.status(500).json({ status: false, message: "Error interno" });
+    }
 });
 
-router.post('/update-profile', (req, res) => {
+// ============== ACTUALIZAR PERFIL ==============
+router.post('/update-profile', async (req, res) => {
     const { apiKey, type, value } = req.body;
 
     if (!apiKey || !type || value === undefined) {
         return res.status(400).json({ status: false, message: "Faltan parámetros" });
     }
 
-    let users = getUsers();
-    const userIdx = users.findIndex(u => u.key === apiKey);
-
-    if (userIdx === -1) {
-        return res.status(404).json({ status: false, message: "Llave maestra inválida" });
-    }
-
-    const allowedFields = ['username', 'email', 'password', 'profile_img'];
-    if (!allowedFields.includes(type)) {
-        return res.status(400).json({ status: false, message: "Acción no permitida para este campo" });
-    }
-
-    if (users[userIdx].email === 'frasesbebor@gmail.com' && type === 'password') {
-         return res.status(403).json({ status: false, message: "No puedes cambiar la contraseña del ADMIN raíz" });
-    }
-
-    users[userIdx][type] = value;
-    saveUsers(users);
-
-    res.json({ 
-        status: true, 
-        message: "Protocolo actualizado",
-        field: type
-    });
-});
-
-router.get('/stats', (req, res) => {
-    const users = getUsers();
-    const routesPath = path.join(__dirname, '../routes');
-    let endpointCount = 0;
-    
     try {
-        const folders = fs.readdirSync(routesPath);
-        folders.forEach(folder => {
-            const fullPath = path.join(routesPath, folder);
-            if (fs.lstatSync(fullPath).isDirectory()) {
-                const files = fs.readdirSync(fullPath);
-                endpointCount += files.length;
-            }
-        });
-    } catch (e) { endpointCount = 0; }
-    
-    res.json({ status: true, users: users.length, endpoints: endpointCount });
+        const user = await User.findOne({ key: apiKey });
+        if (!user) {
+            return res.status(404).json({ status: false, message: "Llave maestra inválida" });
+        }
+
+        const allowedFields = ['username', 'email', 'password', 'profile_img'];
+        if (!allowedFields.includes(type)) {
+            return res.status(400).json({ status: false, message: "Acción no permitida para este campo" });
+        }
+
+        if (user.email === 'frasesbebor@gmail.com' && type === 'password') {
+            return res.status(403).json({ status: false, message: "No puedes cambiar la contraseña del ADMIN raíz" });
+        }
+
+        user[type] = value;
+        await user.save();
+
+        res.json({ status: true, message: "Protocolo actualizado", field: type });
+    } catch (err) {
+        res.status(500).json({ status: false, message: "Error interno" });
+    }
 });
 
-router.get('/dashboard-global', (req, res) => {
-    const users = getUsers();
-    let globalRequests = 0;
-    users.forEach(u => globalRequests += (u.totalRequest || 0));
-    const topUsers = users
-        .filter(u => u.totalRequest > 0)
-        .sort((a, b) => b.totalRequest - a.totalRequest)
-        .slice(0, 5)
-        .map(u => ({
+// ============== ESTADÍSTICAS ==============
+router.get('/stats', async (req, res) => {
+    try {
+        const userCount = await User.countDocuments();
+        const routesPath = path.join(__dirname, '../routes');
+        let endpointCount = 0;
+
+        try {
+            const folders = fs.readdirSync(routesPath);
+            folders.forEach(folder => {
+                const fullPath = path.join(routesPath, folder);
+                if (fs.lstatSync(fullPath).isDirectory()) {
+                    const files = fs.readdirSync(fullPath);
+                    endpointCount += files.length;
+                }
+            });
+        } catch (e) { endpointCount = 0; }
+
+        res.json({ status: true, users: userCount, endpoints: endpointCount });
+    } catch (err) {
+        res.status(500).json({ status: false, message: "Error interno" });
+    }
+});
+
+// ============== DASHBOARD GLOBAL ==============
+router.get('/dashboard-global', async (req, res) => {
+    try {
+        const startTime = global.startTime || Date.now();
+        const totalUsers = await User.countDocuments();
+        
+        const users = await User.find({ totalRequest: { $gt: 0 } }).sort({ totalRequest: -1 }).limit(5);
+        const top5 = users.map(u => ({
             username: u.username,
             total: u.totalRequest,
             initial: u.username.charAt(0).toUpperCase()
         }));
-    res.json({ status: true, totalUsers: users.length, globalRequests, uptime: startTime, top5: topUsers });
-});
 
-router.get('/admin/all', (req, res) => {
-    const { apiKey } = req.query;
-    const users = getUsers();
-    const admin = users.find(u => u.key === apiKey && u.role === 'admin');
-    if (!admin) return res.status(403).json({ status: false, message: "No autorizado" });
-    res.json({ status: true, users });
-});
+        const globalRequestsResult = await User.aggregate([
+            { $group: { _id: null, total: { $sum: "$totalRequest" } } }
+        ]);
+        const globalRequests = globalRequestsResult[0]?.total || 0;
 
-router.post('/admin/update', (req, res) => {
-    const { adminKey, targetEmail, newData } = req.body;
-    let users = getUsers();
-    const admin = users.find(u => u.key === adminKey && u.role === 'admin');
-    if (!admin || targetEmail === 'frasesbebor@gmail.com') return res.status(403).json({ status: false });
-
-    const idx = users.findIndex(u => u.email === targetEmail);
-    if (idx !== -1) {
-        users[idx] = { ...users[idx], ...newData };
-        saveUsers(users);
-        return res.json({ status: true });
+        res.json({ status: true, totalUsers, globalRequests, uptime: startTime, top5 });
+    } catch (err) {
+        res.status(500).json({ status: false, message: "Error interno" });
     }
-    res.status(404).json({ status: false });
 });
 
-router.post('/admin/delete', (req, res) => {
-    const { adminKey, targetEmail } = req.body;
-    let users = getUsers();
-    const admin = users.find(u => u.key === adminKey && u.role === 'admin');
-    if (!admin || targetEmail === 'frasesbebor@gmail.com') return res.status(403).json({ status: false });
+// ============== ADMIN: VER TODOS ==============
+router.get('/admin/all', async (req, res) => {
+    const { apiKey } = req.query;
+    try {
+        const admin = await User.findOne({ key: apiKey, role: 'admin' });
+        if (!admin) return res.status(403).json({ status: false, message: "No autorizado" });
 
-    users = users.filter(u => u.email !== targetEmail);
-    saveUsers(users);
-    res.json({ status: true });
+        const users = await User.find({});
+        res.json({ status: true, users });
+    } catch (err) {
+        res.status(500).json({ status: false });
+    }
+});
+
+// ============== ADMIN: ACTUALIZAR ==============
+router.post('/admin/update', async (req, res) => {
+    const { adminKey, targetEmail, newData } = req.body;
+    try {
+        const admin = await User.findOne({ key: adminKey, role: 'admin' });
+        if (!admin || targetEmail === 'frasesbebor@gmail.com') {
+            return res.status(403).json({ status: false });
+        }
+
+        await User.updateOne({ email: targetEmail }, { $set: newData });
+        res.json({ status: true });
+    } catch (err) {
+        res.status(500).json({ status: false });
+    }
+});
+
+// ============== ADMIN: ELIMINAR ==============
+router.post('/admin/delete', async (req, res) => {
+    const { adminKey, targetEmail } = req.body;
+    try {
+        const admin = await User.findOne({ key: adminKey, role: 'admin' });
+        if (!admin || targetEmail === 'frasesbebor@gmail.com') {
+            return res.status(403).json({ status: false });
+        }
+
+        await User.deleteOne({ email: targetEmail });
+        res.json({ status: true });
+    } catch (err) {
+        res.status(500).json({ status: false });
+    }
 });
 
 module.exports = router;
