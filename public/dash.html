@@ -7,8 +7,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    <!-- ✅ ELIMINADO: script de reCAPTCHA V3 -->
-
     <style>
         :root { 
             --neon-blue: #00f3ff; 
@@ -40,8 +38,6 @@
             overflow-x: hidden; 
             transition: background-color var(--transition), color var(--transition);
         }
-
-        /* ✅ ELIMINADOS los estilos de grecaptcha-badge */
 
         #preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--dark-bg); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: background var(--transition); }
         .spinner { width: 50px; height: 50px; border: 3px solid rgba(0, 243, 255, 0.1); border-top: 3px solid var(--neon-blue); border-radius: 50%; animation: spin 1s linear infinite; box-shadow: 0 0 15px var(--neon-blue); }
@@ -172,6 +168,32 @@
 
         .loading-text { margin-top: 15px; font-weight: 900; font-size: 0.8rem; letter-spacing: 2px; color: var(--neon-blue); text-transform: uppercase; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
+        /* Estilos para botones de planes */
+        .btn-upgrade {
+            background: linear-gradient(135deg, #00f3ff, #7000ff);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .btn-upgrade:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(0,243,255,0.5);
+        }
+        .plan-badge {
+            background: gold;
+            color: black;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -279,8 +301,6 @@
                 document.getElementById('theme-btn').querySelector('i').classList.replace('fa-moon', 'fa-sun');
             }
 
-            // ✅ ELIMINADA la ejecución de reCAPTCHA V3
-
             const area = document.getElementById('content-area');
             const pre = document.getElementById('preloader');
 
@@ -298,13 +318,18 @@
                 if (me.status) {
                     const updatedUser = { ...userData, ...me.data };
                     localStorage.setItem('kazuma_user', JSON.stringify(updatedUser));
+                    // Actualizar userData global
+                    Object.assign(userData, me.data);
                 }
+
+                // Mostrar días restantes si es VIP
+                const daysLeftHtml = (userData.daysLeft && userData.daysLeft > 0) ? `<span style="font-size:0.7rem; color:gold;"> (${userData.daysLeft} días restantes)</span>` : '';
 
                 area.innerHTML = `
                 <section style="text-align: center; padding: 25px 0;">
                     <img src="${me.data?.profile_img || 'https://files.catbox.moe/9ssbf9.jpg'}" class="hero-img">
                     <h1 style="font-size: 1.6rem; font-weight: 900; margin: 0; text-transform: uppercase;">SISTEMA <span style="color:var(--neon-blue); text-shadow: 0 0 10px rgba(0,243,255,0.3)">ACTIVO</span></h1>
-                    <p style="color:var(--text-muted); font-size: 0.85rem; font-weight:800; margin-top:8px;">USUARIO: ${userData.username.toUpperCase()}</p>
+                    <p style="color:var(--text-muted); font-size: 0.85rem; font-weight:800; margin-top:8px;">USUARIO: ${userData.username.toUpperCase()} <span id="plan-badge" class="plan-badge" style="margin-left: 10px;">${userData.plan || 'FREE'}</span>${daysLeftHtml}</p>
                 </section>
 
                 <div class="api-card">
@@ -338,6 +363,17 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- SECCIÓN DE MEJORAR PLAN (si no es admin) -->
+                ${userData.role !== 'admin' ? `
+                <div class="api-card" style="background: linear-gradient(135deg, rgba(0,243,255,0.05), rgba(112,0,255,0.05));">
+                    <p style="color: var(--neon-blue); font-size: 0.75rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; letter-spacing: 1px;"><i class="fas fa-crown"></i> Mejorar mi Plan</p>
+                    <button class="btn-upgrade" onclick="window.location.href='/profile'">
+                        <i class="fab fa-paypal"></i> Ver Planes Disponibles
+                    </button>
+                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 10px;">🌟 Desde $1 USD - Obtén más solicitudes y beneficios exclusivos</p>
+                </div>
+                ` : ''}
 
                 <div class="api-card">
                     <p style="color: var(--neon-blue); font-size: 0.75rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; letter-spacing: 1px;"><i class="fas fa-ranking-star"></i> Top 5 usuarios</p>
