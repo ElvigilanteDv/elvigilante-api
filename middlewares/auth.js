@@ -58,7 +58,7 @@ const authHandler = async (req, res, next) => {
         if (user.requestToday >= user.limit) {
             return res.status(429).json({
                 status: false,
-                creator: "DvWilkerOFC",
+                creator: "elvigilante",
                 message: `Límite diario alcanzado (${user.limit}). Mejora tu plan para más requests.`
             });
         }
