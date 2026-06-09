@@ -52,7 +52,7 @@ router.get('/', async (req, res) => {
         const result = await tiktoks(query.trim());
         res.json({
             status: true,
-            creator: "DvWilkerOFC",
+            creator: "elvigilante",
             data: result,
             timestamp: new Date().toISOString()
         });
