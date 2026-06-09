@@ -1,80 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const axios = require('axios');
+const yts = require('yt-search');
 
 async function ytsearch(query) {
     try {
-        const response = await axios({
-            method: "GET",
-            url: "https://www.youtube.com/results",
-            params: {
-                search_query: query
-            },
-            headers: {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                "Accept-Language": "en-US,en;q=0.9",
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-            },
-            timeout: 30000,
-        });
-
-        // Extraer datos del HTML usando regex
-        const html = response.data;
+        const result = await yts(query);
+        const videos = result.videos.slice(0, 10);
         
-        // Buscar el JSON de datos iniciales de YouTube
-        const initialDataMatch = html.match(/var ytInitialData = ({.+?});/);
-        if (!initialDataMatch) {
-            throw new Error("No se pudieron extraer los videos.");
-        }
-
-        const initialData = JSON.parse(initialDataMatch[1]);
-        
-        // Navegar por la estructura de YouTube para encontrar los videos
-        const contents = initialData?.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.contents || [];
-        
-        const videos = [];
-        
-        for (const content of contents) {
-            const itemSection = content?.itemSectionRenderer?.contents || [];
-            
-            for (const item of itemSection) {
-                const videoRenderer = item?.videoRenderer;
-                if (videoRenderer) {
-                    const videoId = videoRenderer?.videoId;
-                    const title = videoRenderer?.title?.runs?.[0]?.text || "Sin título";
-                    const description = videoRenderer?.descriptionSnippet?.runs?.map(r => r.text).join('') || "";
-                    const duration = videoRenderer?.lengthText?.simpleText || "0:00";
-                    const views = videoRenderer?.viewCountText?.simpleText || "0 vistas";
-                    const publishedAt = videoRenderer?.publishedTimeText?.simpleText || "";
-                    const thumbnail = videoRenderer?.thumbnail?.thumbnails?.[0]?.url || "";
-                    const author = videoRenderer?.ownerText?.runs?.[0]?.text || "Desconocido";
-                    const authorId = videoRenderer?.ownerText?.runs?.[0]?.navigationEndpoint?.browseEndpoint?.browseId || "";
-                    
-                    if (videoId && title) {
-                        videos.push({
-                            title: title,
-                            videoId: videoId,
-                            url: `https://www.youtube.com/watch?v=${videoId}`,
-                            duration: duration,
-                            views: views,
-                            thumbnail: thumbnail,
-                            author: author,
-                            authorId: authorId,
-                            publishedAt: publishedAt,
-                            description: description.substring(0, 200) // Limitar descripción
-                        });
-                    }
-                    
-                    if (videos.length >= 10) break;
-                }
-            }
-            if (videos.length >= 10) break;
-        }
-
-        if (videos.length === 0) {
+        if (!videos || videos.length === 0) {
             throw new Error("No se encontraron videos.");
         }
-        
         return videos;
     } catch (error) {
         throw new Error(error.message);
