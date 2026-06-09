@@ -143,7 +143,7 @@ router.get('/', async (req, res) => {
         const result = await scraper.scrape(query, type || null);
         res.json({
             status: true,
-            creator: "DvWilkerOFC",
+            creator: "elvigilante",
             data: result
         });
     } catch (error) {
