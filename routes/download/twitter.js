@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
     const data = await twitterDl(url);
     res.json({
       status: true,
-      creator: 'DvWilkerOFC',
+      creator: 'elvigilante',
       data: data.result
     });
   } catch (error) {
