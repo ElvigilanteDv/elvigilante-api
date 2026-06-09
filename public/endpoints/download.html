@@ -90,7 +90,7 @@
     </header>
 
     <main class="container mx-auto p-4 max-w-2xl">
-        <h2 class="text-xl uppercase tracking-tighter my-6">Descargas y Búsquedas</h2>
+        <h2 class="text-xl uppercase tracking-tighter my-6">Descargas</h2>
 
         <!-- YouTube Audio -->
         <div class="glass p-6 mb-1 overflow-hidden">
@@ -162,18 +162,6 @@
             <div id="res-fb" class="result-box"></div>
         </div>
         <button id="copy-fb" class="btn-copy-json mb-6" onclick="copyResult('fb')"><i class="fas fa-copy mr-2"></i> COPIAR JSON</button>
-
-        <!-- Aptoide Search (NUEVO) -->
-        <div class="glass p-6 mb-1 overflow-hidden">
-            <div class="flex items-center gap-2 font-bold text-sm uppercase">
-                <i class="fas fa-store text-cyan-400"></i> Aptoide Search (Apps Android)
-            </div>
-            <div class="code-box" id="aptoide-path">GET /api/search/aptoide?query=</div>
-            <input id="in-aptoide" class="input-test mb-3" placeholder="Buscar apps... (ej: spotify, whatsapp)">
-            <button class="btn-test" onclick="testApiSearch('aptoide', '/api/search/aptoide')">Buscar en Aptoide</button>
-            <div id="res-aptoide" class="result-box"></div>
-        </div>
-        <button id="copy-aptoide" class="btn-copy-json mb-6" onclick="copyResult('aptoide')"><i class="fas fa-copy mr-2"></i> COPIAR JSON</button>
     </main>
 
     <script>
@@ -183,7 +171,7 @@
             window.location.href = '/login';
         } else {
             document.addEventListener("DOMContentLoaded", () => {
-                const ids = ['ytaudio', 'tt', 'ig', 'fb', 'aptoide'];
+                const ids = ['ytaudio', 'tt', 'ig', 'fb'];
                 ids.forEach(id => {
                     const el = document.getElementById(`${id}-path`);
                     if(el) el.innerText += `&apiKey=${userData.key}`;
@@ -214,28 +202,6 @@
 
             try {
                 const response = await fetch(`${route}?url=${encodeURIComponent(val)}&apiKey=${userData.key}`);
-                const data = await response.json();
-                resBox.innerText = JSON.stringify(data, null, 2);
-                copyBtn.style.display = 'block';
-            } catch (err) { 
-                resBox.innerText = "ERROR DE CONEXIÓN"; 
-                copyBtn.style.display = 'block';
-            }
-        }
-
-        async function testApiSearch(id, route) {
-            const val = document.getElementById(`in-${id}`).value.trim();
-            const resBox = document.getElementById(`res-${id}`);
-            const copyBtn = document.getElementById(`copy-${id}`);
-
-            if (!val) return;
-
-            resBox.style.display = 'block';
-            resBox.innerText = "Buscando...";
-            copyBtn.style.display = 'none';
-
-            try {
-                const response = await fetch(`${route}?query=${encodeURIComponent(val)}&apiKey=${userData.key}`);
                 const data = await response.json();
                 resBox.innerText = JSON.stringify(data, null, 2);
                 copyBtn.style.display = 'block';
