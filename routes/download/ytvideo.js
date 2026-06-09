@@ -104,7 +104,7 @@ module.exports = function(app) {
         } catch (e) {
             return res.status(500).json({
                 status: false,
-                creator: "DVWILKER",
+                creator: "elvigilante",
                 error: e.message || "Unknown error"
             });
         }
