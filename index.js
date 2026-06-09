@@ -26,7 +26,8 @@ const toolQr = require('./routes/tools/qrcode');
 const toolSsweb = require('./routes/tools/ssweb');
 const searchPin = require('./routes/search/pinterest');
 const searchTt = require('./routes/search/tiktok');
-const searchYt = require('./routes/search/youtube'); // 👈 NUEVO
+const searchYt = require('./routes/search/youtube');
+const searchAptoide = require('./routes/search/aptoide'); // 👈 NUEVO
 const dlFb = require('./routes/download/facebookvid');
 const dlIg = require('./routes/download/instagramvid');
 const dlTw = require('./routes/download/twitter');
@@ -43,7 +44,8 @@ app.use('/api/tools/qr', authHandler, toolQr);
 app.use('/api/tools/ssweb', authHandler, toolSsweb);
 app.use('/api/search/pinterest', authHandler, searchPin);
 app.use('/api/search/tiktok', authHandler, searchTt);
-app.use('/api/search/youtube', authHandler, searchYt); // 👈 NUEVO
+app.use('/api/search/youtube', authHandler, searchYt);
+app.use('/api/search/aptoide', authHandler, searchAptoide); // 👈 NUEVO
 app.use('/api/download/facebook', authHandler, dlFb);
 app.use('/api/download/instagram', authHandler, dlIg);
 app.use('/api/download/twitter', authHandler, dlTw);
@@ -59,6 +61,7 @@ app.use('/api/tools/qr', authHandler, toolQr);
 app.use('/api/tools/ssweb', authHandler, toolSsweb);
 app.use('/api/search/pinterest', authHandler, searchPin);
 app.use('/api/search/tiktok', authHandler, searchTt);
+app.use('/api/search/aptoide', authHandler, searchAptoide); // 👈 NUEVO TAMBIÉN AQUÍ
 app.use('/api/download/facebook', authHandler, dlFb);
 app.use('/api/download/instagram', authHandler, dlIg);
 app.use('/api/download/twitter', authHandler, dlTw);
