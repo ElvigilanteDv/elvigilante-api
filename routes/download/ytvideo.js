@@ -66,7 +66,7 @@ module.exports = function(app) {
         if (!url) {
             return res.status(400).json({
                 status: false,
-                creator: "DVWILKER",
+                creator: "elvigilante",
                 error: "URL parameter is required",
                 message: "Please provide a YouTube URL: ?url=YOUTUBE_URL"
             });
@@ -78,7 +78,7 @@ module.exports = function(app) {
             if (!result.success) {
                 return res.status(500).json({
                     status: false,
-                    creator: "DVWILKER",
+                    creator: "elvigilante",
                     error: result.error
                 });
             }
@@ -90,7 +90,7 @@ module.exports = function(app) {
 
             return res.json({
                 status: true,
-                creator: "DVWILKER",
+                creator: "elvigilante",
                 result: {
                     title: result.title,
                     thumbnail: result.thumbnail,
