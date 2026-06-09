@@ -74,7 +74,7 @@ const ytaudio = async (req, res) => {
     if (!url) {
         return res.status(400).json({ 
             status: false, 
-            creator: "DVWILKER", 
+            creator: "elvigilante", 
             error: "URL parameter is required",
             message: "Please provide a YouTube URL: ?url=YOUTUBE_URL"
         });
@@ -87,7 +87,7 @@ const ytaudio = async (req, res) => {
         if (!audio.status) {
             return res.status(500).json({
                 status: false,
-                creator: "DVWILKER",
+                creator: "elvigilante",
                 error: audio.error || audio.msg
             });
         }
@@ -99,7 +99,7 @@ const ytaudio = async (req, res) => {
 
         return res.json({
             status: true,
-            creator: "DVWILKER",
+            creator: "elvigilante",
             result: {
                 title: audio.title,
                 duration: audio.duration,
@@ -111,7 +111,7 @@ const ytaudio = async (req, res) => {
     } catch (e) {
         return res.status(500).json({ 
             status: false, 
-            creator: "DVWILKER", 
+            creator: "elvigilante", 
             error: e.message 
         });
     }
