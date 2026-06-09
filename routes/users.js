@@ -117,7 +117,7 @@ router.post('/login', async (req, res) => {
         if (adminUser && email === adminUser.email && password === adminUser.password) {
             return res.json({
                 status: true,
-                creator: "DvWilkerOFC",
+                creator: "elvigilante",
                 data: {
                     username: adminUser.username,
                     email: adminUser.email,
@@ -140,7 +140,7 @@ router.post('/login', async (req, res) => {
 
         res.json({
             status: true,
-            creator: "DvWilkerOFC",
+            creator: "elvigilante",
             data: {
                 username: user.username,
                 email: user.email,
@@ -166,7 +166,7 @@ router.get('/me', async (req, res) => {
         if (adminUser && apiKey === adminUser.key) {
             return res.json({
                 status: true,
-                creator: "DvWilkerOFC",
+                creator: "elvigilante",
                 data: {
                     username: adminUser.username,
                     email: adminUser.email,
@@ -196,7 +196,7 @@ router.get('/me', async (req, res) => {
 
         res.json({
             status: true,
-            creator: "DvWilkerOFC",
+            creator: "elvigilante",
             data: {
                 username: user.username,
                 email: user.email,
