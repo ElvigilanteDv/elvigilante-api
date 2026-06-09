@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
 
         res.json({
             status: true,
-            creator: 'DvWilkerOFC',
+            creator: 'elvigilante',
             data: result.data.map(item => ({
                 url: item.url,
                 thumbnail: item.thumbnail || null
