@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-// ============ TODOS LOS PERSONAJES (EMBEBIDOS) ============
+// ============ TODOS LOS PERSONAJES ============
 const characters = [
   {
     "name": "Sakura Haruno",
@@ -1418,23 +1418,584 @@ const characters = [
     "defense": 120,
     "health": 130,
     "image": "https://files.catbox.moe/3e9gsw.jpg"
+  },
+  {
+    "name": "Light Yagami",
+    "rarity": "SSR",
+    "attack": 500,
+    "defense": 450,
+    "health": 380,
+    "image": "https://files.catbox.moe/jzvi6k.jpg"
+  },
+  {
+    "name": "L Lawliet",
+    "rarity": "SSR",
+    "attack": 490,
+    "defense": 440,
+    "health": 370,
+    "image": "https://files.catbox.moe/8o3guk.jpg"
+  },
+  {
+    "name": "Ryuk",
+    "rarity": "SR",
+    "attack": 330,
+    "defense": 300,
+    "health": 350,
+    "image": "https://files.catbox.moe/v6c6xv.jpg"
+  },
+  {
+    "name": "Near",
+    "rarity": "SR",
+    "attack": 380,
+    "defense": 360,
+    "health": 300,
+    "image": "https://files.catbox.moe/hdx1ql.jpg"
+  },
+  {
+    "name": "Mello",
+    "rarity": "SR",
+    "attack": 360,
+    "defense": 310,
+    "health": 290,
+    "image": "https://files.catbox.moe/pjmity.jpg"
+  },
+  {
+    "name": "Rem (Shinigami)",
+    "rarity": "SR",
+    "attack": 320,
+    "defense": 290,
+    "health": 330,
+    "image": "https://files.catbox.moe/4w8b4o.jpg"
+  },
+  {
+    "name": "Edward Elric",
+    "rarity": "SR",
+    "attack": 295,
+    "defense": 255,
+    "health": 270,
+    "image": "https://files.catbox.moe/gctjg0.jpg"
+  },
+  {
+    "name": "Alphonse Elric",
+    "rarity": "SR",
+    "attack": 260,
+    "defense": 310,
+    "health": 320,
+    "image": "https://files.catbox.moe/ei9m66.jpg"
+  },
+  {
+    "name": "Roy Mustang",
+    "rarity": "SR",
+    "attack": 340,
+    "defense": 270,
+    "health": 280,
+    "image": "https://files.catbox.moe/3oxfna.jpg"
+  },
+  {
+    "name": "Father",
+    "rarity": "SSR",
+    "attack": 580,
+    "defense": 550,
+    "health": 530,
+    "image": "https://files.catbox.moe/nq6u7a.jpg"
+  },
+  {
+    "name": "Greed",
+    "rarity": "SR",
+    "attack": 360,
+    "defense": 380,
+    "health": 370,
+    "image": "https://files.catbox.moe/5yn54w.jpg"
+  },
+  {
+    "name": "Envy",
+    "rarity": "SR",
+    "attack": 350,
+    "defense": 300,
+    "health": 340,
+    "image": "https://files.catbox.moe/xvfxq3.jpg"
+  },
+  {
+    "name": "Lust",
+    "rarity": "SR",
+    "attack": 330,
+    "defense": 290,
+    "health": 310,
+    "image": "https://files.catbox.moe/e357i3.jpg"
+  },
+  {
+    "name": "Scar",
+    "rarity": "SR",
+    "attack": 370,
+    "defense": 300,
+    "health": 330,
+    "image": "https://files.catbox.moe/2xpk5a.jpg"
+  },
+  {
+    "name": "Alex Louis Armstrong",
+    "rarity": "SR",
+    "attack": 320,
+    "defense": 360,
+    "health": 380,
+    "image": "https://files.catbox.moe/s577mi.jpg"
+  },
+  {
+    "name": "Thorfinn",
+    "rarity": "SR",
+    "attack": 310,
+    "defense": 250,
+    "health": 280,
+    "image": "https://files.catbox.moe/1l6dua.jpg"
+  },
+  {
+    "name": "Askeladd",
+    "rarity": "SR",
+    "attack": 330,
+    "defense": 270,
+    "health": 290,
+    "image": "https://files.catbox.moe/o3kawy.jpg"
+  },
+  {
+    "name": "Bjorn",
+    "rarity": "SR",
+    "attack": 350,
+    "defense": 310,
+    "health": 380,
+    "image": "https://files.catbox.moe/03zpl1.jpg"
+  },
+  {
+    "name": "Floki",
+    "rarity": "SR",
+    "attack": 300,
+    "defense": 260,
+    "health": 270,
+    "image": "https://files.catbox.moe/hbldbk.jpg"
+  },
+  {
+    "name": "Thors",
+    "rarity": "SSR",
+    "attack": 470,
+    "defense": 420,
+    "health": 450,
+    "image": "https://files.catbox.moe/nmqyuk.jpg"
+  },
+  {
+    "name": "Denji",
+    "rarity": "SR",
+    "attack": 340,
+    "defense": 290,
+    "health": 350,
+    "image": "https://files.catbox.moe/0hd9y0.jpg"
+  },
+  {
+    "name": "Power",
+    "rarity": "SR",
+    "attack": 320,
+    "defense": 260,
+    "health": 310,
+    "image": "https://files.catbox.moe/3pgxcf.jpg"
+  },
+  {
+    "name": "Makima",
+    "rarity": "SSR",
+    "attack": 560,
+    "defense": 510,
+    "health": 490,
+    "image": "https://files.catbox.moe/dlaoj5.jpg"
+  },
+  {
+    "name": "Aki Hayakawa",
+    "rarity": "SR",
+    "attack": 310,
+    "defense": 280,
+    "health": 300,
+    "image": "https://files.catbox.moe/c4vc0r.jpg"
+  },
+  {
+    "name": "Kishibe",
+    "rarity": "SSR",
+    "attack": 450,
+    "defense": 400,
+    "health": 420,
+    "image": "https://files.catbox.moe/gtdwm4.jpg"
+  },
+  {
+    "name": "Quanxi",
+    "rarity": "SSR",
+    "attack": 500,
+    "defense": 440,
+    "health": 460,
+    "image": "https://files.catbox.moe/otieww.jpg"
+  },
+  {
+    "name": "Katana Man",
+    "rarity": "SR",
+    "attack": 330,
+    "defense": 280,
+    "health": 310,
+    "image": "https://files.catbox.moe/psdqt8.jpg"
+  },
+  {
+    "name": "Lelouch vi Britannia",
+    "rarity": "SSR",
+    "attack": 510,
+    "defense": 460,
+    "health": 400,
+    "image": "https://files.catbox.moe/gpxgj3.jpg"
+  },
+  {
+    "name": "Suzaku Kururugi",
+    "rarity": "SR",
+    "attack": 360,
+    "defense": 320,
+    "health": 340,
+    "image": "https://files.catbox.moe/rfj7z4.jpg"
+  },
+  {
+    "name": "C.C.",
+    "rarity": "SR",
+    "attack": 300,
+    "defense": 340,
+    "health": 500,
+    "image": "https://files.catbox.moe/k2h14x.jpg"
+  },
+  {
+    "name": "Kallen Stadtfeld",
+    "rarity": "SR",
+    "attack": 370,
+    "defense": 290,
+    "health": 320,
+    "image": "https://files.catbox.moe/g4vwt3.jpg"
+  },
+  {
+    "name": "Schneizel el Britannia",
+    "rarity": "SSR",
+    "attack": 490,
+    "defense": 450,
+    "health": 410,
+    "image": "https://files.catbox.moe/mnme5h.jpg"
+  },
+  {
+    "name": "Sora",
+    "rarity": "SR",
+    "attack": 280,
+    "defense": 240,
+    "health": 260,
+    "image": "https://files.catbox.moe/luj03t.jpg"
+  },
+  {
+    "name": "Shiro",
+    "rarity": "SR",
+    "attack": 270,
+    "defense": 230,
+    "health": 250,
+    "image": "https://files.catbox.moe/dmp780.jpg"
+  },
+  {
+    "name": "Jibril",
+    "rarity": "SSR",
+    "attack": 520,
+    "defense": 480,
+    "health": 450,
+    "image": "https://files.catbox.moe/pr6pis.jpg"
+  },
+  {
+    "name": "Stephanie Dola",
+    "rarity": "R",
+    "attack": 100,
+    "defense": 90,
+    "health": 120,
+    "image": "https://files.catbox.moe/dj4x0x.jpg"
+  },
+  {
+    "name": "Rimuru Tempest",
+    "rarity": "SSR",
+    "attack": 580,
+    "defense": 560,
+    "health": 570,
+    "image": "https://files.catbox.moe/uvdfz5.jpg"
+  },
+  {
+    "name": "Milim Nava",
+    "rarity": "SSR",
+    "attack": 600,
+    "defense": 520,
+    "health": 530,
+    "image": "https://files.catbox.moe/gbulsi.jpg"
+  },
+  {
+    "name": "Benimaru",
+    "rarity": "SR",
+    "attack": 350,
+    "defense": 290,
+    "health": 320,
+    "image": "https://files.catbox.moe/ybshiu.jpg"
+  },
+  {
+    "name": "Shion",
+    "rarity": "SR",
+    "attack": 370,
+    "defense": 300,
+    "health": 340,
+    "image": "https://files.catbox.moe/ri3zbm.jpg"
+  },
+  {
+    "name": "Gobta",
+    "rarity": "R",
+    "attack": 110,
+    "defense": 100,
+    "health": 130,
+    "image": "https://files.catbox.moe/4bhxpu.jpg"
+  },
+  {
+    "name": "Diablo",
+    "rarity": "SSR",
+    "attack": 560,
+    "defense": 530,
+    "health": 510,
+    "image": "https://files.catbox.moe/s88821.jpg"
+  },
+  {
+    "name": "Veldora Tempest",
+    "rarity": "SSR",
+    "attack": 620,
+    "defense": 580,
+    "health": 600,
+    "image": "https://files.catbox.moe/x6ugl8.jpg"
+  },
+  {
+    "name": "Guy Crimson",
+    "rarity": "SSR",
+    "attack": 640,
+    "defense": 610,
+    "health": 620,
+    "image": "https://files.catbox.moe/pm7iyf.jpg"
+  },
+  {
+    "name": "Tohru",
+    "rarity": "SSR",
+    "attack": 480,
+    "defense": 460,
+    "health": 500,
+    "image": "https://files.catbox.moe/h4fluv.jpg"
+  },
+  {
+    "name": "Lucoa",
+    "rarity": "SSR",
+    "attack": 550,
+    "defense": 520,
+    "health": 530,
+    "image": "https://files.catbox.moe/zb5r9l.jpg"
+  },
+  {
+    "name": "Kanna Kamui",
+    "rarity": "SR",
+    "attack": 300,
+    "defense": 280,
+    "health": 310,
+    "image": "https://files.catbox.moe/fcjtf1.jpg"
+  },
+  {
+    "name": "Elma",
+    "rarity": "SR",
+    "attack": 320,
+    "defense": 310,
+    "health": 330,
+    "image": "https://files.catbox.moe/484pxf.jpeg"
+  },
+  {
+    "name": "Shinji Ikari",
+    "rarity": "SR",
+    "attack": 280,
+    "defense": 200,
+    "health": 240,
+    "image": "https://files.catbox.moe/fyzlcz.jpg"
+  },
+  {
+    "name": "Rei Ayanami",
+    "rarity": "SR",
+    "attack": 260,
+    "defense": 220,
+    "health": 250,
+    "image": "https://files.catbox.moe/sc0dng.jpg"
+  },
+  {
+    "name": "Asuka Langley",
+    "rarity": "SR",
+    "attack": 300,
+    "defense": 230,
+    "health": 260,
+    "image": "https://files.catbox.moe/91zjyq.jpg"
+  },
+  {
+    "name": "Kaworu Nagisa",
+    "rarity": "SSR",
+    "attack": 490,
+    "defense": 460,
+    "health": 440,
+    "image": "https://files.catbox.moe/lp3h4e.jpg"
+  },
+  {
+    "name": "Boruto Uzumaki",
+    "rarity": "SR",
+    "attack": 300,
+    "defense": 250,
+    "health": 280,
+    "image": "https://files.catbox.moe/nkcpkc.jpg"
+  },
+  {
+    "name": "Kawaki",
+    "rarity": "SSR",
+    "attack": 450,
+    "defense": 400,
+    "health": 420,
+    "image": "https://files.catbox.moe/ldcdbj.jpg"
+  },
+  {
+    "name": "Momoshiki Otsutsuki",
+    "rarity": "SSR",
+    "attack": 530,
+    "defense": 490,
+    "health": 470,
+    "image": "https://files.catbox.moe/6bpngi.jpg"
+  },
+  {
+    "name": "Maka Albarn",
+    "rarity": "SR",
+    "attack": 270,
+    "defense": 240,
+    "health": 260,
+    "image": "https://files.catbox.moe/ypmmlg.jpg"
+  },
+  {
+    "name": "Soul Evans",
+    "rarity": "SR",
+    "attack": 280,
+    "defense": 250,
+    "health": 265,
+    "image": "https://files.catbox.moe/emb9d2.jpg"
+  },
+  {
+    "name": "Death the Kid",
+    "rarity": "SSR",
+    "attack": 460,
+    "defense": 430,
+    "health": 420,
+    "image": "https://files.catbox.moe/ocl0r5.jpg"
+  },
+  {
+    "name": "Black Star",
+    "rarity": "SR",
+    "attack": 340,
+    "defense": 270,
+    "health": 310,
+    "image": "https://files.catbox.moe/sw2iab.jpg"
+  },
+  {
+    "name": "Lord Death",
+    "rarity": "SSR",
+    "attack": 700,
+    "defense": 680,
+    "health": 650,
+    "image": "https://files.catbox.moe/qv2hmo.jpg"
+  },
+  {
+    "name": "Asura (Kishin)",
+    "rarity": "SSR",
+    "attack": 620,
+    "defense": 560,
+    "health": 580,
+    "image": "https://files.catbox.moe/mrc1sc.jpg"
+  },
+  {
+    "name": "Koro-sensei",
+    "rarity": "SSR",
+    "attack": 580,
+    "defense": 540,
+    "health": 560,
+    "image": "https://files.catbox.moe/ba4e1w.jpg"
+  },
+  {
+    "name": "Karma Akabane",
+    "rarity": "SR",
+    "attack": 310,
+    "defense": 270,
+    "health": 290,
+    "image": "https://files.catbox.moe/dxpfe4.jpg"
+  },
+  {
+    "name": "Nagisa Shiota",
+    "rarity": "SR",
+    "attack": 290,
+    "defense": 260,
+    "health": 275,
+    "image": "https://files.catbox.moe/7ohy0c.jpg"
+  },
+  {
+    "name": "Accelerator",
+    "rarity": "SSR",
+    "attack": 600,
+    "defense": 580,
+    "health": 540,
+    "image": "https://files.catbox.moe/dt2ymt.jpg"
+  },
+  {
+    "name": "Mikoto Misaka",
+    "rarity": "SSR",
+    "attack": 520,
+    "defense": 460,
+    "health": 480,
+    "image": "https://files.catbox.moe/3re8fn.jpg"
+  },
+  {
+    "name": "Touma Kamijou",
+    "rarity": "SR",
+    "attack": 320,
+    "defense": 290,
+    "health": 310,
+    "image": "https://files.catbox.moe/aohk89.jpg"
+  },
+  {
+    "name": "Naofumi Iwatani",
+    "rarity": "SR",
+    "attack": 220,
+    "defense": 400,
+    "health": 420,
+    "image": "https://files.catbox.moe/tib6li.jpg"
+  },
+  {
+    "name": "Raphtalia",
+    "rarity": "SR",
+    "attack": 310,
+    "defense": 260,
+    "health": 290,
+    "image": "https://files.catbox.moe/ltt263.jpg"
+  },
+  {
+    "name": "Filo",
+    "rarity": "SR",
+    "attack": 340,
+    "defense": 240,
+    "health": 310,
+    "image": "https://files.catbox.moe/2c1bqn.jpg"
+  },
+  {
+    "name": "Malty Melromarc",
+    "rarity": "SR",
+    "attack": 290,
+    "defense": 260,
+    "health": 270,
+    "image": "https://files.catbox.moe/uz49us.jpg"
   }
 ];
 
 // ============ FUNCIONES DEL GACHA ============
 
-// Función para obtener personajes por rareza
 function getCharactersByRarity(rarity) {
     return characters.filter(c => c.rarity === rarity);
 }
 
-// Función para tirar gacha
 function pullGacha() {
-    if (characters.length === 0) {
-        return null;
-    }
-    
-    // Probabilidades: SSR=5%, SR=25%, R=70%
     const random = Math.random() * 100;
     let rarity;
     
@@ -1449,7 +2010,6 @@ function pullGacha() {
     const available = getCharactersByRarity(rarity);
     
     if (available.length === 0) {
-        // Si no hay de esa rareza, devolver cualquiera
         const anyChar = characters[Math.floor(Math.random() * characters.length)];
         return {
             name: anyChar.name,
@@ -1476,7 +2036,6 @@ function pullGacha() {
 
 // ============ ENDPOINTS ============
 
-// 1. Tirada simple
 router.get('/pull', async (req, res) => {
     try {
         const result = pullGacha();
@@ -1505,7 +2064,6 @@ router.get('/pull', async (req, res) => {
     }
 });
 
-// 2. Multi-pull (10 tiradas)
 router.get('/multipull', async (req, res) => {
     try {
         const pulls = [];
@@ -1541,7 +2099,6 @@ router.get('/multipull', async (req, res) => {
     }
 });
 
-// 3. Obtener todos los personajes
 router.get('/characters', async (req, res) => {
     const { rarity, search } = req.query;
     
@@ -1580,7 +2137,6 @@ router.get('/characters', async (req, res) => {
     }
 });
 
-// 4. Obtener personaje por índice
 router.get('/character/:id', async (req, res) => {
     const { id } = req.params;
     
@@ -1607,7 +2163,6 @@ router.get('/character/:id', async (req, res) => {
     }
 });
 
-// 5. Estadísticas del gacha
 router.get('/stats', async (req, res) => {
     try {
         const total = characters.length;
