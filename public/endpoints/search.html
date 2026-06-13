@@ -14,18 +14,11 @@
         body { background-color: var(--dark-bg); color: var(--text-main); font-family: 'Inter', sans-serif; }
         #safety-block { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
 
-        /* Contenedor principal de la card */
         .glass { background: var(--card-bg); border: 1px solid rgba(0, 243, 255, 0.1); border-radius: 24px; }
-
-        /* Bloque de código de la URL */
         .code-box { background: var(--code-bg); padding: 12px; border-radius: 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--neon-blue); border: 1px solid rgba(0,243,255,0.1); word-break: break-all; margin: 15px 0; }
-
         .input-test { width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); padding: 14px; border-radius: 12px; color: #fff; outline: none; font-size: 0.85rem; }
-
         .btn-test { background: var(--neon-blue); color: #000; border: none; padding: 14px; width: 100%; border-radius: 12px; font-weight: 900; text-transform: uppercase; cursor: pointer; font-size: 0.75rem; transition: 0.3s; }
         .btn-test:hover { filter: brightness(1.2); transform: scale(1.01); }
-
-        /* El BASH: Cuadro de respuesta con scroll interno fijo */
         .result-box { 
             background: #05050a; 
             color: #00ffcc; 
@@ -37,20 +30,14 @@
             border: 1px solid rgba(0, 255, 204, 0.1); 
             white-space: pre-wrap; 
             word-break: break-all; 
-
-            /* Ajustes para scroll interno */
-            height: 350px; /* Altura fija para no dañar el diseño */
-            overflow-y: auto; /* Scroll vertical */
+            height: 350px; 
+            overflow-y: auto; 
             overflow-x: hidden;
             display: none; 
         }
-
-        /* Estilo del scrollbar para que se vea pro */
         .result-box::-webkit-scrollbar { width: 4px; }
         .result-box::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 10px; }
-
         .btn-copy-json { background: rgba(255, 255, 255, 0.05); color: #fff; width: 100%; padding: 10px; border-radius: 0 0 15px 15px; font-size: 10px; font-weight: 800; display: none; border-top: 1px solid rgba(255,255,255,0.05); }
-
         h2 { border-left: 5px solid var(--neon-blue); padding-left: 15px; font-weight: 900; }
         .grecaptcha-badge { z-index: 9999 !important; }
     </style>
@@ -85,7 +72,7 @@
         </div>
         <button id="copy-tt" class="btn-copy-json mb-6" onclick="copyResult('tt')"><i class="fas fa-copy mr-2"></i> COPIAR JSON</button>
 
-        <!-- YouTube Search (NUEVO) -->
+        <!-- YouTube Search -->
         <div class="glass p-6 mb-1 overflow-hidden">
             <div class="font-bold text-sm uppercase mb-2"><i class="fab fa-youtube text-red-600"></i> YouTube Search</div>
             <div class="code-box" id="yt-path">GET /api/search/youtube?apiKey=</div>
@@ -94,6 +81,17 @@
             <div id="res-yt" class="result-box"></div>
         </div>
         <button id="copy-yt" class="btn-copy-json mb-6" onclick="copyResult('yt')"><i class="fas fa-copy mr-2"></i> COPIAR JSON</button>
+
+        <!-- Memes Search (Reddit en español) -->
+        <div class="glass p-6 mb-1 overflow-hidden">
+            <div class="font-bold text-sm uppercase mb-2"><i class="fas fa-face-laugh-squint text-yellow-500"></i> Memes Search (Reddit)</div>
+            <div class="code-box" id="memes-path">GET /api/search/memes?apiKey=</div>
+            <input id="in-memes" class="input-test mb-3" placeholder="Buscar memes (ej: programador, gato)...">
+            <button class="btn-test" onclick="testSearch('memes', '/api/search/memes')">Buscar Memes</button>
+            <div id="res-memes" class="result-box"></div>
+        </div>
+        <button id="copy-memes" class="btn-copy-json mb-6" onclick="copyResult('memes')"><i class="fas fa-copy mr-2"></i> COPIAR JSON</button>
+
     </main>
 
     <script>
@@ -101,7 +99,7 @@
         if (!userData) { window.location.href = '/login'; }
         else {
             document.addEventListener("DOMContentLoaded", () => {
-                ['pin', 'tt', 'yt'].forEach(id => {
+                ['pin', 'tt', 'yt', 'memes'].forEach(id => {
                     const el = document.getElementById(`${id}-path`);
                     if(el) el.innerText += `${userData.key}&query=...`;
                 });
