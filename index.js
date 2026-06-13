@@ -20,14 +20,14 @@ mongoose.connect(`${MONGODB_URI}/${MONGODB_DB}`, {
 
 app.set('trust proxy', 1);
 app.use(express.json());
-
 const aiGemini = require('./routes/ai/gemini');
 const toolQr = require('./routes/tools/qrcode');
 const toolSsweb = require('./routes/tools/ssweb');
-const gacha = require('./routes/tools/gacha'); // 👈 NUEVO
+const gacha = require('./routes/tools/gacha');
 const searchPin = require('./routes/search/pinterest');
 const searchTt = require('./routes/search/tiktok');
 const searchYt = require('./routes/search/youtube');
+const searchMemes = require('./routes/search/memes'); // 👈 NUEVO (buscador de memes)
 const dlFb = require('./routes/download/facebookvid');
 const dlIg = require('./routes/download/instagramvid');
 const dlTw = require('./routes/download/twitter');
@@ -42,23 +42,11 @@ app.use('/api/auth', userAuth);
 app.use('/api/ai/gemini', authHandler, aiGemini);
 app.use('/api/tools/qr', authHandler, toolQr);
 app.use('/api/tools/ssweb', authHandler, toolSsweb);
-app.use('/api/tools/gacha', authHandler, gacha); // 👈 NUEVO (en tools)
+app.use('/api/tools/gacha', authHandler, gacha);
 app.use('/api/search/pinterest', authHandler, searchPin);
 app.use('/api/search/tiktok', authHandler, searchTt);
 app.use('/api/search/youtube', authHandler, searchYt);
-app.use('/api/download/facebook', authHandler, dlFb);
-app.use('/api/download/instagram', authHandler, dlIg);
-app.use('/api/download/twitter', authHandler, dlTw);
-app.use('/api/download/pinterest', authHandler, dlPin);
-app.use('/api/download/tiktok', authHandler, dlTt);
-app.use('/api/download/ytaudio', authHandler, dlYtAudio);
-app.use('/api/download/ytvideo', authHandler, dlYtVideo);
-
-app.use('/api/ai/gemini', authHandler, aiGemini);
-app.use('/api/tools/qr', authHandler, toolQr);
-app.use('/api/tools/ssweb', authHandler, toolSsweb);
-app.use('/api/search/pinterest', authHandler, searchPin);
-app.use('/api/search/tiktok', authHandler, searchTt);
+app.use('/api/search/memes', authHandler, searchMemes); // 👈 NUEVO
 app.use('/api/download/facebook', authHandler, dlFb);
 app.use('/api/download/instagram', authHandler, dlIg);
 app.use('/api/download/twitter', authHandler, dlTw);
