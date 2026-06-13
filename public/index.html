@@ -67,7 +67,7 @@
         .brand span { color: var(--neon-blue); }
 
         .header-icons { display: flex; gap: 15px; align-items: center; }
-        
+
         .btn-circle {
             background: rgba(255,255,255,0.05);
             border: none;
@@ -285,7 +285,7 @@
         .feature-info h3 { margin: 0; font-size: 1.1rem; }
         .feature-info p { margin: 5px 0 0 0; font-size: 0.8rem; color: var(--text-muted); }
 
-        /* Perfil Félix Ofc */
+        /* Perfil elvigilante */
         .dev-section {
             background: var(--card-bg);
             margin: 40px 20px;
@@ -392,7 +392,7 @@
 <body>
 
     <header>
-        <div class="brand"><i class="fas fa-microchip" style="color: var(--neon-blue);"></i> DvWilkerOFC <span>API</span></div>
+        <div class="brand"><i class="fas fa-microchip" style="color: var(--neon-blue);"></i> elvigilante <span>API</span></div>
         <div class="header-icons">
             <div class="btn-circle" onclick="toggleTheme()" id="theme-btn">
                 <i class="fas fa-moon"></i>
@@ -418,7 +418,7 @@
         <div class="hero-shape"></div>
         <div class="hero-card">
             <div class="hero-card-inner">
-                <img src="https://raw.githubusercontent.com/dvwilker/gohan-storage/main/1778169562859-IMG-20260504-WA0386.jpg" alt="DvElvigilanteOFCBanner">
+                <img src="https://raw.githubusercontent.com/dvwilker/gohan-storage/main/1778169562859-IMG-20260504-WA0386.jpg" alt="elvigilante Banner">
                 <div class="status-badge">
                     <div class="dot"></div>
                     Api activa 24/7
@@ -429,7 +429,7 @@
 
     <section class="info-section">
         <h1>Centro de <span>Funciones</span></h1>
-        <p class="description">Optimiza tus webs y bots con la API De DvElvigilanteOFC.</p>
+        <p class="description">Optimiza tus webs y bots con la API de elvigilante.</p>
     </section>
 
     <div class="stats-container">
@@ -464,7 +464,7 @@
     <div class="feature-card">
         <div class="feature-icon"><i class="fas fa-shield-virus"></i></div>
         <div class="feature-info">
-            <h3>Seguridad DvW</h3>
+            <h3>Seguridad élite</h3>
             <p>ApiKey única para cada una de tus solicitudes.</p>
         </div>
     </div>
@@ -472,11 +472,11 @@
     <div class="section-label">Desarrollador Principal</div>
 
     <div class="dev-section">
-        <img src="https://raw.githubusercontent.com/dvwilker/gohan-storage/main/1778169555425-IMG-20260507-WA0354.jpg" class="dev-avatar" alt="Felix Ofc">
-        <h2 class="dev-name">Te king Wilker</h2>
-        <span class="dev-tag">System Admin & Dev</span>
+        <img src="https://raw.githubusercontent.com/dvwilker/gohan-storage/main/1778169555425-IMG-20260507-WA0354.jpg" class="dev-avatar" alt="elvigilante">
+        <h2 class="dev-name">elvigilante</h2>
+        <span class="dev-tag">Full Stack & API Architect</span>
         <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 15px;">
-            Creador de DvWilkerOFC v1. Especialista en diversos ámbitos de programación, principalmente en diseño web.
+            Creador de elvigilante API. Especialista en integración de servicios, automatización y diseño de APIs de alto rendimiento.
         </p>
         <div class="skill-tags">
             <div class="skill-tag"><i class="fab fa-node-js"></i> Node.js</div>
@@ -484,12 +484,13 @@
             <div class="skill-tag"><i class="fab fa-python"></i> Python</div>
             <div class="skill-tag"><i class="fas fa-database"></i> SQLite</div>
             <div class="skill-tag"><i class="fab fa-linux"></i> Linux</div>
+            <div class="skill-tag"><i class="fas fa-cloud"></i> Cloud</div>
         </div>
     </div>
 
     <footer>
         <div>elvigilante API</div>
-        <div class="copyright">© 2026 <div>elvigilante API. All rights reserved. Powered by Surubi-Team</div>
+        <div class="copyright">© 2026 elvigilante API. All rights reserved. Powered by Surubi-Team</div>
     </footer>
 
     <script>
@@ -509,32 +510,32 @@
 
             if (body.classList.contains('light-mode')) {
                 icon.classList.replace('fa-moon', 'fa-sun');
-                localStorage.setItem('dvwilker-theme', 'light');
+                localStorage.setItem('elvigilante-theme', 'light');
             } else {
                 icon.classList.replace('fa-sun', 'fa-moon');
-                localStorage.setItem('dvwilker-theme', 'dark');
+                localStorage.setItem('elvigilante-theme', 'dark');
             }
         }
 
         // Cargar estadísticas y tema guardado al iniciar
         async function initPage() {
             // 1. Verificar tema guardado
-            const savedTheme = localStorage.getItem('dvwilker-theme');
+            const savedTheme = localStorage.getItem('elvigilante-theme');
             if (savedTheme === 'light') {
                 document.body.classList.add('light-mode');
                 document.getElementById('theme-btn').querySelector('i').classList.replace('fa-moon', 'fa-sun');
             }
 
-            // 2. Fetch de estadísticas
+            // 2. Fetch de estadísticas (usa tu endpoint real)
             try {
                 const res = await fetch('/api/auth/stats');
                 const data = await res.json();
                 document.getElementById('userCount').innerText = `+${data.users || 0}`;
                 document.getElementById('endpointCount').innerText = `+${data.endpoints || 0}`;
             } catch (e) {
-                console.log("Error sincronizando con backend Kurayami");
-                document.getElementById('userCount').innerText = "+250";
-                document.getElementById('endpointCount').innerText = "+150";
+                console.log("No se pudieron obtener estadísticas del servidor");
+                document.getElementById('userCount').innerText = "+128";
+                document.getElementById('endpointCount').innerText = "+42";
             }
         }
 
