@@ -20,6 +20,7 @@ mongoose.connect(`${MONGODB_URI}/${MONGODB_DB}`, {
 
 app.set('trust proxy', 1);
 app.use(express.json());
+
 const aiGemini = require('./routes/ai/gemini');
 const toolQr = require('./routes/tools/qrcode');
 const toolSsweb = require('./routes/tools/ssweb');
