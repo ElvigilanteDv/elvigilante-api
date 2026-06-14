@@ -17,7 +17,6 @@
             --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Variables para Modo Claro */
         body.light-mode {
             --dark-bg: #f4f4f9;
             --card-bg: #ffffff;
@@ -35,7 +34,6 @@
             transition: background-color var(--transition), color var(--transition);
         }
 
-        /* Header Estilo Gohan hack */
         header {
             background: rgba(12, 12, 20, 0.8);
             backdrop-filter: blur(15px);
@@ -65,7 +63,6 @@
         }
 
         .brand span { color: var(--neon-blue); }
-
         .header-icons { display: flex; gap: 15px; align-items: center; }
 
         .btn-circle {
@@ -87,7 +84,6 @@
             color: #1a1a1a;
         }
 
-        /* Banner Principal Inclinado */
         .hero-banner {
             position: relative;
             padding: 60px 20px;
@@ -151,11 +147,12 @@
             gap: 8px;
             border: 1px solid rgba(0, 243, 255, 0.3);
             color: white;
+            white-space: nowrap;
         }
 
-        .dot { width: 8px; height: 8px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 10px #00ff88; }
+        .dot { width: 8px; height: 8px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 10px #00ff88; animation: blink 1.5s infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-        /* Centro de Información */
         .info-section {
             text-align: center;
             padding: 40px 20px;
@@ -183,7 +180,6 @@
             transition: color var(--transition);
         }
 
-        /* Stats Estilo Moderno */
         .stats-container {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -220,7 +216,6 @@
             font-weight: 800;
         }
 
-        /* Botón de Acción */
         .cta-container {
             padding: 0 20px;
             margin-bottom: 60px;
@@ -241,7 +236,6 @@
             box-shadow: 0 10px 30px rgba(0, 243, 255, 0.2);
         }
 
-        /* Sección Categorías / Características */
         .section-label {
             padding: 0 20px;
             font-size: 0.75rem;
@@ -280,12 +274,121 @@
             justify-content: center;
             font-size: 1.5rem;
             color: var(--neon-blue);
+            flex-shrink: 0;
         }
 
         .feature-info h3 { margin: 0; font-size: 1.1rem; }
         .feature-info p { margin: 5px 0 0 0; font-size: 0.8rem; color: var(--text-muted); }
 
-        /* Perfil elvigilante */
+        /* Sección de créditos/recompensas */
+        .credits-section {
+            background: var(--card-bg);
+            margin: 20px;
+            border-radius: 30px;
+            padding: 30px 25px;
+            border: 1px solid rgba(0, 243, 255, 0.15);
+            transition: background var(--transition), border var(--transition);
+        }
+
+        body.light-mode .credits-section {
+            border: 1px solid rgba(0,0,0,0.08);
+        }
+
+        .credits-title {
+            font-size: 1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 0 5px 0;
+            color: var(--neon-blue);
+        }
+
+        .credits-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin: 0 0 25px 0;
+        }
+
+        .credits-item {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        body.light-mode .credits-item {
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .credits-item:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+        .credits-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: rgba(0,243,255,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--neon-blue);
+            flex-shrink: 0;
+        }
+
+        .credits-icon.purple { background: rgba(112,0,255,0.08); color: #a855f7; }
+        .credits-icon.green { background: rgba(0,255,136,0.08); color: #00ff88; }
+        .credits-icon.orange { background: rgba(255,165,0,0.08); color: #ffa500; }
+
+        .credits-text h4 { margin: 0 0 4px 0; font-size: 0.9rem; font-weight: 800; }
+        .credits-text p { margin: 0; font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; }
+
+        .credits-rules {
+            background: rgba(255,50,50,0.05);
+            border: 1px solid rgba(255,50,50,0.15);
+            border-radius: 18px;
+            padding: 18px;
+            margin-top: 20px;
+        }
+
+        .credits-rules p {
+            margin: 0 0 8px 0;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .credits-rules p:last-child { margin: 0; }
+        .credits-rules span { color: #ff4444; font-weight: 900; flex-shrink: 0; }
+
+        .credits-cta {
+            background: linear-gradient(135deg, rgba(0,243,255,0.08), rgba(112,0,255,0.08));
+            border: 1px solid rgba(0,243,255,0.15);
+            border-radius: 18px;
+            padding: 18px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .credits-cta p { margin: 0 0 12px 0; font-size: 0.8rem; color: var(--text-muted); }
+
+        .credits-cta a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--neon-blue);
+            color: #000;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 900;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+        }
+
         .dev-section {
             background: var(--card-bg);
             margin: 40px 20px;
@@ -341,11 +444,8 @@
             transition: background var(--transition);
         }
 
-        body.light-mode .skill-tag {
-            background: #f0f0f5;
-        }
+        body.light-mode .skill-tag { background: #f0f0f5; }
 
-        /* Footer */
         footer {
             padding: 40px 20px;
             text-align: center;
@@ -355,7 +455,6 @@
         .footer-logo { font-weight: 900; opacity: 0.5; margin-bottom: 10px; }
         .copyright { font-size: 0.7rem; color: var(--text-muted); }
 
-        /* Sidebar */
         .sidebar {
             position: fixed;
             top: 0; right: -100%;
@@ -376,10 +475,7 @@
             margin-bottom: 10px; font-weight: 700;
             transition: background var(--transition);
         }
-
-        body.light-mode .sidebar-link {
-            background: rgba(0,0,0,0.03);
-        }
+        body.light-mode .sidebar-link { background: rgba(0,0,0,0.03); }
 
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -406,7 +502,7 @@
     <nav class="sidebar" id="sidebar">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
             <span style="font-weight: 900; color: var(--neon-blue);">MENU</span>
-            <i class="fas fa-times" onclick="toggleMenu()"></i>
+            <i class="fas fa-times" onclick="toggleMenu()" style="cursor:pointer;"></i>
         </div>
         <a href="/login" class="sidebar-link"><i class="fas fa-key"></i> Iniciar Sesión</a>
         <a href="/register" class="sidebar-link"><i class="fas fa-user-plus"></i> Registrarse</a>
@@ -418,7 +514,7 @@
         <div class="hero-shape"></div>
         <div class="hero-card">
             <div class="hero-card-inner">
-                <img src="https://raw.githubusercontent.com/dvwilker/gohan-storage/main/1778169562859-IMG-20260504-WA0386.jpg" alt="elvigilante Banner">
+                <img src="https://files.catbox.moe/jgpqy0.webp" alt="elvigilante Banner">
                 <div class="status-badge">
                     <div class="dot"></div>
                     Api activa 24/7
@@ -469,7 +565,58 @@
         </div>
     </div>
 
-    <div class="section-label">Desarrollador Principal</div>
+    <!-- SECCIÓN DE CRÉDITOS Y RECOMPENSAS -->
+    <div class="section-label" style="margin-top: 40px;">🎁 Gana solicitudes gratis</div>
+
+    <div class="credits-section">
+        <p class="credits-title">¿Usas mi API en tu bot?</p>
+        <p class="credits-subtitle">Apóyame dándole visibilidad y te recompenso con solicitudes extra sin costo.</p>
+
+        <div class="credits-item">
+            <div class="credits-icon"><i class="fas fa-tag"></i></div>
+            <div class="credits-text">
+                <h4>Deja créditos visibles</h4>
+                <p>Agrega <strong>"API by ElVigilante"</strong> o <strong>"Créditos: @elvigilante"</strong> en tu bot o proyecto, visible para tus usuarios.</p>
+            </div>
+        </div>
+
+        <div class="credits-item">
+            <div class="credits-icon purple"><i class="fas fa-bullhorn"></i></div>
+            <div class="credits-text">
+                <h4>Promociona la API</h4>
+                <p>Comparte el link de registro en grupos de WhatsApp, canales de Telegram, Discord, redes sociales o comunidades de desarrollo.</p>
+            </div>
+        </div>
+
+        <div class="credits-item">
+            <div class="credits-icon green"><i class="fas fa-users"></i></div>
+            <div class="credits-text">
+                <h4>Invita nuevos usuarios</h4>
+                <p>Si alguien se registra mencionando que llegó por ti, <strong>ambos reciben solicitudes extra</strong> como recompensa.</p>
+            </div>
+        </div>
+
+        <div class="credits-item">
+            <div class="credits-icon orange"><i class="fab fa-github"></i></div>
+            <div class="credits-text">
+                <h4>README Bonus</h4>
+                <p>¿Tu proyecto está en GitHub u otra plataforma? Incluir el link de la API en tu <code style="background:rgba(255,255,255,0.05); padding:2px 6px; border-radius:6px;">README.md</code> también suma recompensas adicionales.</p>
+            </div>
+        </div>
+
+        <div class="credits-rules">
+            <p><span>❌</span> Multicuentas o cuentas falsas para obtener recompensas — bloqueo permanente inmediato.</p>
+            <p><span>❌</span> Pruebas falsas — toda evidencia se verifica antes de entregar beneficios.</p>
+            <p><span>❌</span> Usar la API sin dar créditos — tu acceso podrá ser suspendido.</p>
+        </div>
+
+        <div class="credits-cta">
+            <p>Envía tus capturas, links o repositorio junto con el correo con el que te registraste. Revisamos todo manualmente en menos de 24 horas.</p>
+            <a href="https://wa.me/59177474230" target="_blank"><i class="fab fa-whatsapp"></i> Enviar pruebas por WhatsApp</a>
+        </div>
+    </div>
+
+    <div class="section-label" style="margin-top: 40px;">Desarrollador Principal</div>
 
     <div class="dev-section">
         <img src="https://raw.githubusercontent.com/dvwilker/gohan-storage/main/1778169555425-IMG-20260507-WA0354.jpg" class="dev-avatar" alt="elvigilante">
@@ -489,25 +636,21 @@
     </div>
 
     <footer>
-        <div>elvigilante API</div>
+        <div class="footer-logo">elvigilante API</div>
         <div class="copyright">© 2026 elvigilante API. All rights reserved. Powered by Surubi-Team</div>
     </footer>
 
     <script>
-        // Función para abrir/cerrar menú
         function toggleMenu() {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('overlay').classList.toggle('active');
         }
 
-        // Función para cambiar el Tema (Light/Dark)
         function toggleTheme() {
             const body = document.body;
             const themeBtn = document.getElementById('theme-btn');
             const icon = themeBtn.querySelector('i');
-
             body.classList.toggle('light-mode');
-
             if (body.classList.contains('light-mode')) {
                 icon.classList.replace('fa-moon', 'fa-sun');
                 localStorage.setItem('elvigilante-theme', 'light');
@@ -517,23 +660,18 @@
             }
         }
 
-        // Cargar estadísticas y tema guardado al iniciar
         async function initPage() {
-            // 1. Verificar tema guardado
             const savedTheme = localStorage.getItem('elvigilante-theme');
             if (savedTheme === 'light') {
                 document.body.classList.add('light-mode');
                 document.getElementById('theme-btn').querySelector('i').classList.replace('fa-moon', 'fa-sun');
             }
-
-            // 2. Fetch de estadísticas (usa tu endpoint real)
             try {
                 const res = await fetch('/api/auth/stats');
                 const data = await res.json();
                 document.getElementById('userCount').innerText = `+${data.users || 0}`;
                 document.getElementById('endpointCount').innerText = `+${data.endpoints || 0}`;
             } catch (e) {
-                console.log("No se pudieron obtener estadísticas del servidor");
                 document.getElementById('userCount').innerText = "+128";
                 document.getElementById('endpointCount').innerText = "+42";
             }
