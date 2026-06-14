@@ -47,13 +47,15 @@ router.get('/', async (req, res) => {
                     use_speaker_boost: true
                 }
             },
-            responseType: 'stream',
+            responseType: 'arraybuffer',
             timeout: 30000
         });
 
+        const buffer = Buffer.from(response.data);
         res.setHeader('Content-Type', 'audio/mpeg');
+        res.setHeader('Content-Length', buffer.length);
         res.setHeader('Content-Disposition', `inline; filename="tts_${genero}_${Date.now()}.mp3"`);
-        response.data.pipe(res);
+        res.end(buffer);
 
     } catch (error) {
         const msg = error.response?.data?.detail?.message || error.message || 'Error al generar el audio';
