@@ -3,69 +3,76 @@ const router = express.Router();
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const MEMEDROID_URLS = [
-    'https://es.memedroid.com/memes/top/day',
-    'https://es.memedroid.com/memes/top/week',
-    'https://es.memedroid.com/memes/top/month',
-];
-
-async function obtenerMemes(cantidad = 1) {
-    const url = MEMEDROID_URLS[Math.floor(Math.random() * MEMEDROID_URLS.length)];
-
-    const { data } = await axios.get(url, {
-        headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36',
-            'Accept-Language': 'es-ES,es;q=0.9',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        },
-        timeout: 15000,
-    });
-
-    const $ = cheerio.load(data);
-    const memes = [];
-
-    $('article.gallery-item').each((i, el) => {
-        if (memes.length >= cantidad) return false;
-
-        const titulo = $(el).find('.item-aux-container .title').text().trim() || 'Sin título';
-        const imagen = $(el).find('img.img-responsive').attr('src') || $(el).find('img').attr('src');
-        const votos = $(el).find('.score .value').text().trim() || '0';
-        const enlace = 'https://es.memedroid.com' + ($(el).find('a').attr('href') || '');
-
-        if (imagen && imagen.startsWith('http')) {
-            memes.push({
-                titulo,
-                imagen,
-                enlace,
-                votos: parseInt(votos) || 0,
-                fuente: 'Memedroid'
-            });
-        }
-    });
-
-    if (memes.length === 0) throw new Error('No se pudieron obtener memes de Memedroid');
-
-    return memes;
-}
-
-// GET /api/search/memes?cantidad=5
 router.get('/', async (req, res) => {
     const cantidad = Math.min(parseInt(req.query.cantidad) || 1, 10);
 
     try {
-        const resultado = await obtenerMemes(cantidad);
+        const { data } = await axios.get('https://es.memedroid.com/memes/top/day', {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Accept': 'text/html,application/xhtml+xml',
+                'Accept-Language': 'es-ES,es;q=0.9'
+            },
+            timeout: 10000
+        });
 
-        res.json({
+        const $ = cheerio.load(data);
+        const memes = [];
+
+        $('img').each((i, el) => {
+            const src = $(el).attr('src') || $(el).attr('data-src') || '';
+            const alt = $(el).attr('alt') || '';
+
+            if (src && (src.includes('memedroid') || src.includes('meme')) &&
+                (src.endsWith('.jpg') || src.endsWith('.jpeg') || src.endsWith('.png') || src.endsWith('.gif')) &&
+                !src.includes('avatar') && !src.includes('logo') && !src.includes('icon')) {
+                memes.push({
+                    titulo: alt || 'Meme en español',
+                    imagen: src.startsWith('http') ? src : 'https://es.memedroid.com' + src,
+                    fuente: 'Memedroid',
+                    idioma: 'Español'
+                });
+            }
+        });
+
+        // Fallback si no encuentra nada
+        if (memes.length === 0) {
+            $('article, .meme-item, .gallery-item').each((i, el) => {
+                const img = $(el).find('img').attr('src') || $(el).find('img').attr('data-src') || '';
+                const titulo = $(el).find('img').attr('alt') || 'Meme';
+                if (img && (img.endsWith('.jpg') || img.endsWith('.jpeg') || img.endsWith('.png'))) {
+                    memes.push({
+                        titulo,
+                        imagen: img.startsWith('http') ? img : 'https://es.memedroid.com' + img,
+                        fuente: 'Memedroid',
+                        idioma: 'Español'
+                    });
+                }
+            });
+        }
+
+        if (memes.length === 0) {
+            return res.status(404).json({
+                status: false,
+                error: 'No se encontraron memes. Intenta de nuevo.'
+            });
+        }
+
+        // Mezclar y tomar la cantidad pedida
+        const mezclados = memes.sort(() => Math.random() - 0.5).slice(0, cantidad);
+
+        return res.json({
             status: true,
             creator: 'elvigilante',
-            total: resultado.length,
-            data: cantidad === 1 ? resultado[0] : resultado,
+            total: mezclados.length,
+            data: cantidad === 1 ? mezclados[0] : mezclados,
             timestamp: new Date().toISOString()
         });
+
     } catch (error) {
-        res.status(500).json({
+        return res.status(500).json({
             status: false,
-            error: error.message || 'Error interno del servidor'
+            error: 'Error al obtener memes'
         });
     }
 });
