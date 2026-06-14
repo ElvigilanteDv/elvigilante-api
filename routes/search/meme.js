@@ -1,93 +1,65 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
+const cheerio = require('cheerio');
 
-const subredditsEspanol = [
-    'memesES',
-    'memexico',
-    'SpanishMeme',
-    'MemesEnEspanol',
-    'dankespanol',
-    'MujicoCity',
-    'ArgentinaMemes',
-    'ChileMemes',
-    'ColombiaMemes',
-    'PeruMemes'
+const MEMEDROID_URLS = [
+    'https://es.memedroid.com/memes/top/day',
+    'https://es.memedroid.com/memes/top/week',
+    'https://es.memedroid.com/memes/top/month',
 ];
 
-async function obtenerMeme() {
-    const intentos = [...subredditsEspanol].sort(() => Math.random() - 0.5); // mezclar orden
+async function obtenerMemes(cantidad = 1) {
+    const url = MEMEDROID_URLS[Math.floor(Math.random() * MEMEDROID_URLS.length)];
 
-    for (const sub of intentos) {
-        try {
-            const response = await axios({
-                method: 'GET',
-                url: `https://meme-api.com/gimme/${sub}`,
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                    'Accept': 'application/json'
-                },
-                timeout: 10000,
+    const { data } = await axios.get(url, {
+        headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36',
+            'Accept-Language': 'es-ES,es;q=0.9',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        },
+        timeout: 15000,
+    });
+
+    const $ = cheerio.load(data);
+    const memes = [];
+
+    $('article.gallery-item').each((i, el) => {
+        if (memes.length >= cantidad) return false;
+
+        const titulo = $(el).find('.item-aux-container .title').text().trim() || 'Sin título';
+        const imagen = $(el).find('img.img-responsive').attr('src') || $(el).find('img').attr('src');
+        const votos = $(el).find('.score .value').text().trim() || '0';
+        const enlace = 'https://es.memedroid.com' + ($(el).find('a').attr('href') || '');
+
+        if (imagen && imagen.startsWith('http')) {
+            memes.push({
+                titulo,
+                imagen,
+                enlace,
+                votos: parseInt(votos) || 0,
+                fuente: 'Memedroid'
             });
-
-            const data = response.data;
-
-            if (data && data.url && !data.nsfw) {
-                return {
-                    titulo: data.title || 'Sin título',
-                    imagen: data.url,
-                    enlace: data.postLink || null,
-                    subreddit: data.subreddit,
-                    autor: data.author,
-                    votos: data.ups || 0,
-                    nsfw: data.nsfw || false
-                };
-            }
-        } catch (e) {
-            console.error(`Error en r/${sub}:`, e.message);
-            continue; // intentar con el siguiente subreddit
         }
-    }
+    });
 
-    throw new Error('No se pudo obtener ningún meme en este momento');
-}
+    if (memes.length === 0) throw new Error('No se pudieron obtener memes de Memedroid');
 
-async function obtenerVarios(cantidad = 5) {
-    const resultados = [];
-    const promesas = Array.from({ length: cantidad }, () => obtenerMeme());
-    const resueltos = await Promise.allSettled(promesas);
-
-    for (const r of resueltos) {
-        if (r.status === 'fulfilled') {
-            resultados.push(r.value);
-        }
-    }
-
-    if (resultados.length === 0) {
-        throw new Error('No se pudieron obtener memes en este momento');
-    }
-
-    return resultados;
+    return memes;
 }
 
 // GET /api/search/memes?cantidad=5
 router.get('/', async (req, res) => {
-    const cantidad = Math.min(parseInt(req.query.cantidad) || 1, 10); // máx 10
+    const cantidad = Math.min(parseInt(req.query.cantidad) || 1, 10);
 
     try {
-        let resultado;
-
-        if (cantidad === 1) {
-            resultado = await obtenerMeme();
-        } else {
-            resultado = await obtenerVarios(cantidad);
-        }
+        const resultado = await obtenerMemes(cantidad);
 
         res.json({
             status: true,
             creator: 'elvigilante',
-            total: Array.isArray(resultado) ? resultado.length : 1,
-            data: resultado,
+            total: resultado.length,
+            data: cantidad === 1 ? resultado[0] : resultado,
             timestamp: new Date().toISOString()
         });
     } catch (error) {
