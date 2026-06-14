@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Anime | elvigilante API</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=6Lfw-dwsAAAAACc6y5K4sfFnplSqbskYPia1ADh5"></script>
+
+    <style>
+        :root { --neon-blue: #00f3ff; --dark-bg: #09090b; --card-bg: #11111d; --text-main: #ffffff; --code-bg: #05050a; }
+        body { background-color: var(--dark-bg); color: var(--text-main); font-family: 'Inter', sans-serif; }
+        #safety-block { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
+
+        .glass { background: var(--card-bg); border: 1px solid rgba(0, 243, 255, 0.1); border-radius: 24px; }
+        .code-box { background: var(--code-bg); padding: 12px; border-radius: 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--neon-blue); border: 1px solid rgba(0,243,255,0.1); word-break: break-all; margin: 15px 0; }
+        .btn-test { background: var(--neon-blue); color: #000; border: none; padding: 14px; width: 100%; border-radius: 12px; font-weight: 900; text-transform: uppercase; cursor: pointer; font-size: 0.75rem; transition: 0.3s; }
+        .btn-test:hover { filter: brightness(1.2); transform: scale(1.01); }
+        .result-box { 
+            background: #05050a; 
+            color: #00ffcc; 
+            padding: 15px; 
+            border-radius: 12px; 
+            margin-top: 15px; 
+            font-size: 0.7rem; 
+            font-family: 'JetBrains Mono', monospace; 
+            border: 1px solid rgba(0, 255, 204, 0.1); 
+            white-space: pre-wrap; 
+            word-break: break-all; 
+            height: 350px; 
+            overflow-y: auto; 
+            overflow-x: hidden;
+            display: none; 
+        }
+        .result-box::-webkit-scrollbar { width: 4px; }
+        .result-box::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 10px; }
+        .btn-copy-json { background: rgba(255, 255, 255, 0.05); color: #fff; width: 100%; padding: 10px; border-radius: 0 0 15px 15px; font-size: 10px; font-weight: 800; display: none; border-top: 1px solid rgba(255,255,255,0.05); }
+        h2 { border-left: 5px solid var(--neon-blue); padding-left: 15px; font-weight: 900; }
+        .grecaptcha-badge { z-index: 9999 !important; }
+
+        /* Preview de video */
+        .video-preview { 
+            width: 100%; 
+            border-radius: 12px; 
+            margin-top: 15px; 
+            display: none; 
+            max-height: 300px;
+            border: 1px solid rgba(0,243,255,0.15);
+        }
+        .tag { 
+            display: inline-block; 
+            background: rgba(0,243,255,0.08); 
+            border: 1px solid rgba(0,243,255,0.2); 
+            color: var(--neon-blue); 
+            font-size: 0.65rem; 
+            font-weight: 800; 
+            padding: 3px 10px; 
+            border-radius: 999px; 
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-10">
+    <div id="safety-block"></div>
+    <header class="p-4 flex justify-between items-center sticky top-0 z-50 bg-[#09090b]/80 backdrop-blur-md border-b border-white/5">
+        <div class="font-black text-xl tracking-tighter cursor-pointer" onclick="location.href='/dash'">ELVIGILANTE <span style="color: var(--neon-blue)">DASH</span></div>
+        <button onclick="location.href='/dash'" class="text-xs font-bold bg-white/5 px-4 py-2 rounded-xl border border-white/10"><i class="fas fa-home"></i></button>
+    </header>
+
+    <main class="container mx-auto p-4 max-w-2xl">
+        <h2 class="text-xl uppercase tracking-tighter my-6">Anime</h2>
+
+        <!-- Kiss -->
+        <div class="glass p-6 mb-1 overflow-hidden">
+            <div class="tag">VIDEO ALEATORIO</div>
+            <div class="font-bold text-sm uppercase mb-1"><i class="fas fa-heart text-pink-500"></i> Anime Kiss</div>
+            <p class="text-xs text-white/40 mb-2">Devuelve un video aleatorio de beso anime.</p>
+            <div class="code-box" id="kiss-path">GET /api/anime/kiss?apiKey=</div>
+            <button class="btn-test" onclick="testAnime('kiss', '/api/anime/kiss')">🎲 Obtener Kiss</button>
+            <video id="vid-kiss" class="video-preview" controls autoplay muted loop></video>
+            <div id="res-kiss" class="result-box"></div>
+        </div>
+        <button id="copy-kiss" class="btn-copy-json mb-6" onclick="copyResult('kiss')"><i class="fas fa-copy mr-2"></i> COPIAR JSON</button>
+
+        <!-- Aquí puedes agregar más categorías anime -->
+        <!-- Ejemplo: hug, slap, pat, etc. -->
+
+    </main>
+
+    <script>
+        const userData = JSON.parse(localStorage.getItem('kazuma_user'));
+        if (!userData) { window.location.href = '/login'; }
+        else {
+            document.addEventListener("DOMContentLoaded", () => {
+                ['kiss'].forEach(id => {
+                    const el = document.getElementById(`${id}-path`);
+                    if (el) el.innerText += userData.key;
+                });
+                setTimeout(() => document.getElementById('safety-block').style.display = 'none', 300);
+            });
+        }
+
+        async function testAnime(id, route) {
+            const resBox = document.getElementById(`res-${id}`);
+            const copyBtn = document.getElementById(`copy-${id}`);
+            const video = document.getElementById(`vid-${id}`);
+
+            resBox.style.display = 'block';
+            resBox.innerText = "OBTENIENDO...";
+            copyBtn.style.display = 'none';
+            if (video) video.style.display = 'none';
+
+            try {
+                const response = await fetch(`${route}?apiKey=${userData.key}`);
+                const data = await response.json();
+                resBox.innerText = JSON.stringify(data, null, 2);
+                copyBtn.style.display = 'block';
+
+                // Si hay URL de video, mostrar preview
+                if (data.status && data.url && video) {
+                    video.src = data.url;
+                    video.style.display = 'block';
+                }
+            } catch (e) {
+                resBox.innerText = "ERROR EN EL SERVIDOR";
+            }
+        }
+
+        function copyResult(id) {
+            const text = document.getElementById(`res-${id}`).innerText;
+            navigator.clipboard.writeText(text);
+            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Copiado', showConfirmButton: false, timer: 1000, background: '#11111d', color: '#fff' });
+        }
+
+        window.onload = () => {
+            grecaptcha.ready(() => {
+                grecaptcha.execute('6Lfw-dwsAAAAACc6y5K4sfFnplSqbskYPia1ADh5', { action: 'anime_test' });
+            });
+        };
+    </script>
+</body>
+</html>
