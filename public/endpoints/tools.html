@@ -38,6 +38,10 @@
         .rarity-SSR { background: #ffd700; color: #000; }
         .rarity-SR { background: #c0c0c0; color: #000; }
         .rarity-R { background: #cd7f32; color: #000; }
+        .gender-selector { display: flex; gap: 8px; margin-bottom: 12px; }
+        .gender-btn { flex: 1; padding: 10px; border-radius: 12px; border: 1px solid rgba(0,243,255,0.2); background: rgba(0,243,255,0.05); color: #fff; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .gender-btn.active { background: var(--neon-blue); color: #000; border-color: var(--neon-blue); }
+        .audio-player { width: 100%; margin-top: 15px; border-radius: 12px; display: none; accent-color: var(--neon-blue); }
     </style>
 </head>
 <body class="min-h-screen pb-10">
@@ -72,11 +76,25 @@
             <div class="text-center"><img id="view-qr" class="img-result mx-auto !w-48"></div>
         </div>
 
-        <!-- Gacha System (NUEVO) -->
+        <!-- TTS -->
+        <div class="glass p-6 mb-1 overflow-hidden">
+            <div class="font-bold text-sm uppercase mb-2"><i class="fas fa-microphone text-cyan-400"></i> Text to Speech</div>
+            <div class="code-box" id="tts-path">GET /api/tools/tts?apiKey=</div>
+            <p class="text-xs text-white/40 mb-3">Convierte texto en voz. Elige el género:</p>
+            <div class="gender-selector">
+                <button class="gender-btn active" id="btn-mujer" onclick="setGenero('mujer')">👩 Mujer</button>
+                <button class="gender-btn" id="btn-hombre" onclick="setGenero('hombre')">👨 Hombre</button>
+            </div>
+            <textarea id="texto-tts" class="input-test" rows="3" placeholder="Escribe el texto que quieres escuchar..." style="resize:none; height:90px;"></textarea>
+            <button class="btn-test" onclick="testTTS()">🎙️ Generar Voz</button>
+            <audio id="audio-tts" class="audio-player" controls></audio>
+        </div>
+        <div class="mb-6"></div>
+
+        <!-- Gacha System -->
         <div class="glass p-6 mb-6 overflow-hidden">
             <div class="font-bold text-sm uppercase mb-2"><i class="fas fa-dice-d6 text-cyan-400"></i> Gacha System (Anime)</div>
             <div class="code-box" id="gacha-path">GET /api/tools/gacha/pull?apiKey=</div>
-            
             <div class="flex gap-3 mb-3">
                 <button class="btn-test" onclick="testGacha('pull')"><i class="fas fa-hand-fist"></i> 1 Pull</button>
                 <button class="btn-test" onclick="testGacha('multipull')"><i class="fas fa-layer-group"></i> 10 Pulls</button>
@@ -87,10 +105,10 @@
             </div>
             <input id="search-character" class="input-test" placeholder="Buscar personaje...">
             <button class="btn-test bg-white/5" onclick="testGacha('search')"><i class="fas fa-search"></i> Buscar</button>
-            
             <div id="result-gacha" class="result-box"></div>
         </div>
         <button id="copy-gacha" class="btn-copy-json mb-6" onclick="copyResult('gacha')"><i class="fas fa-copy mr-2"></i> COPIAR JSON</button>
+
     </main>
 
     <script>
@@ -100,15 +118,43 @@
             document.addEventListener("DOMContentLoaded", () => {
                 document.getElementById('ss-path').innerText += `${userData.key}&url=...&device=...&theme=...`;
                 document.getElementById('qr-path').innerText += `${userData.key}&text=...`;
+                document.getElementById('tts-path').innerText += `${userData.key}&texto=...&genero=mujer`;
                 document.getElementById('gacha-path').innerText = `GET /api/tools/gacha/pull?apiKey=${userData.key}`;
                 setTimeout(() => document.getElementById('safety-block').style.display='none', 300);
             });
         }
 
+        let generoTTS = 'mujer';
+
+        function setGenero(g) {
+            generoTTS = g;
+            document.getElementById('btn-mujer').classList.toggle('active', g === 'mujer');
+            document.getElementById('btn-hombre').classList.toggle('active', g === 'hombre');
+        }
+
+        async function testTTS() {
+            const texto = document.getElementById('texto-tts').value.trim();
+            const audio = document.getElementById('audio-tts');
+
+            if (!texto) return Swal.fire({ icon: 'warning', title: 'Escribe algo', background: '#11111d', color: '#fff' });
+
+            Swal.fire({ title: 'Generando voz...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            try {
+                const url = `/api/tools/tts?texto=${encodeURIComponent(texto)}&genero=${generoTTS}&apiKey=${userData.key}`;
+                audio.src = url;
+                audio.style.display = 'block';
+                await audio.load();
+                Swal.close();
+                audio.play();
+            } catch (e) {
+                Swal.fire({ icon: 'error', title: 'Error al generar voz', background: '#11111d', color: '#fff' });
+            }
+        }
+
         async function testMedia(type) {
             const imgEl = document.getElementById(`view-${type}`);
             let finalUrl = "";
-
             if(type === 'ssweb') {
                 const u = document.getElementById('url-ss').value;
                 const d = document.getElementById('device-ss').value;
@@ -120,7 +166,6 @@
                 if(!txt) return;
                 finalUrl = `/api/tools/qr?text=${encodeURIComponent(txt)}&apiKey=${userData.key}`;
             }
-
             Swal.fire({ title: 'Procesando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             imgEl.src = finalUrl;
             imgEl.onload = () => { imgEl.style.display = 'block'; Swal.close(); };
@@ -130,31 +175,20 @@
             const resBox = document.getElementById('result-gacha');
             const copyBtn = document.getElementById('copy-gacha');
             let url = '';
-
             switch(action) {
-                case 'pull':
-                    url = `/api/tools/gacha/pull?apiKey=${userData.key}`;
-                    break;
-                case 'multipull':
-                    url = `/api/tools/gacha/multipull?apiKey=${userData.key}`;
-                    break;
-                case 'characters':
-                    url = `/api/tools/gacha/characters?apiKey=${userData.key}`;
-                    break;
-                case 'stats':
-                    url = `/api/tools/gacha/stats?apiKey=${userData.key}`;
-                    break;
+                case 'pull': url = `/api/tools/gacha/pull?apiKey=${userData.key}`; break;
+                case 'multipull': url = `/api/tools/gacha/multipull?apiKey=${userData.key}`; break;
+                case 'characters': url = `/api/tools/gacha/characters?apiKey=${userData.key}`; break;
+                case 'stats': url = `/api/tools/gacha/stats?apiKey=${userData.key}`; break;
                 case 'search':
                     const search = document.getElementById('search-character').value.trim();
                     if(!search) return Swal.fire({ icon: 'warning', title: 'Escribe un nombre', background: '#11111d', color: '#fff' });
                     url = `/api/tools/gacha/characters?search=${encodeURIComponent(search)}&apiKey=${userData.key}`;
                     break;
             }
-
             resBox.style.display = 'block';
             resBox.innerText = "CARGANDO...";
             copyBtn.style.display = 'none';
-
             try {
                 const response = await fetch(url);
                 const data = await response.json();
