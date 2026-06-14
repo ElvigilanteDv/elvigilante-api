@@ -38,6 +38,7 @@ const dlYtAudio = require('./routes/download/ytaudio');
 const dlYtVideo = require('./routes/download/ytvideo');
 const animeKiss = require('./routes/anime/kiss');
 const animeSad = require('./routes/anime/sad');
+const animeSolo = require('./routes/anime/solo');
 const userAuth = require('./routes/users');
 
 app.use('/api/auth', userAuth);
@@ -58,6 +59,7 @@ app.use('/api/download/tiktok', authHandler, dlTt);
 app.use('/api/download/ytaudio', authHandler, dlYtAudio);
 app.use('/api/download/ytvideo', authHandler, dlYtVideo);
 app.use('/api/anime/kiss', authHandler, animeKiss); 
+app.use('/api/anime/solo', authHandler, animeSolo);
 app.use('/api/anime/sad', authHandler, animeSad);
 
 app.get('/', (req, res) => {
