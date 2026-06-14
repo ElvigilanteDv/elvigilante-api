@@ -47,7 +47,7 @@ app.use('/api/tools/gacha', authHandler, gacha);
 app.use('/api/search/pinterest', authHandler, searchPin);
 app.use('/api/search/tiktok', authHandler, searchTt);
 app.use('/api/search/youtube', authHandler, searchYt);   
-app.use('/api/search/memes', authHandler, searchMemes         
+app.use('/api/search/memes', authHandler, searchMemes);         
 app.use('/api/download/facebook', authHandler, dlFb);
 app.use('/api/download/instagram', authHandler, dlIg);
 app.use('/api/download/twitter', authHandler, dlTw);
