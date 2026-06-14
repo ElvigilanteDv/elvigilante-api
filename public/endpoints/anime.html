@@ -88,11 +88,11 @@
 
         <!-- Solo -->
         <div class="glass p-6 mb-1 overflow-hidden">
-            <div class="tag tag-red">🔞 VIDEO ALEATORIO</div>
-            <div class="font-bold text-sm uppercase mb-1"><i class="fas fa-fire text-red-500"></i> Anime Solo</div>
+            <div class="tag">VIDEO ALEATORIO</div>
+            <div class="font-bold text-sm uppercase mb-1"><i class="fas fa-fire text-orange-400"></i> Anime Solo</div>
             <p class="text-xs text-white/40 mb-2">Devuelve un video aleatorio. Solo para mayores de 18.</p>
             <div class="code-box" id="solo-path">GET /api/anime/solo?apiKey=</div>
-            <button class="btn-test" style="background: #ff4444;" onclick="testAnime('solo', '/api/anime/solo')">🎲 Obtener Solo</button>
+            <button class="btn-test" onclick="testAnime('solo', '/api/anime/solo')">🎲 Obtener Solo</button>
             <div id="res-solo" class="result-box"></div>
         </div>
         <button id="copy-solo" class="btn-copy-json mb-6" onclick="copyResult('solo')"><i class="fas fa-copy mr-2"></i> COPIAR JSON</button>
