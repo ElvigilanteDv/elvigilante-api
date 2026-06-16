@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { File } = require('megajs');
+const axios = require('axios');
 
 // GET /api/download/mega?url=https://mega.nz/file/xxx#key
 router.get('/', async (req, res) => {
@@ -14,21 +14,23 @@ router.get('/', async (req, res) => {
     }
 
     try {
-        const file = File.fromURL(url);
-        await file.loadAttributes();
+        const response = await axios.get(`https://api.vevioz.com/api/mega?url=${encodeURIComponent(url)}`, {
+            timeout: 30000,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+        });
 
-        // Obtener link de descarga temporal
-        const downloadUrl = await file.link();
+        const data = response.data;
+
+        if (!data || data.error) {
+            throw new Error(data?.error || 'No se pudo resolver el link de MEGA');
+        }
 
         return res.json({
             status: true,
             creator: 'elvigilante',
-            data: {
-                nombre: file.name,
-                tamaño: file.size,
-                tamaño_legible: formatBytes(file.size),
-                url_descarga: downloadUrl
-            },
+            data,
             timestamp: new Date().toISOString()
         });
 
@@ -39,13 +41,5 @@ router.get('/', async (req, res) => {
         });
     }
 });
-
-function formatBytes(bytes) {
-    if (!bytes) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
-}
 
 module.exports = router;
