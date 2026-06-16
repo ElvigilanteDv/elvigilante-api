@@ -162,6 +162,19 @@
             <div id="res-fb" class="result-box"></div>
         </div>
         <button id="copy-fb" class="btn-copy-json mb-6" onclick="copyResult('fb')"><i class="fas fa-copy mr-2"></i> COPIAR JSON</button>
+
+        <!-- MEGA -->
+        <div class="glass p-6 mb-1 overflow-hidden">
+            <div class="flex items-center gap-2 font-bold text-sm uppercase">
+                <i class="fas fa-cloud-download-alt text-cyan-400"></i> MEGA
+            </div>
+            <div class="code-box" id="mega-path">GET /api/download/mega?url=</div>
+            <input id="in-mega" class="input-test mb-3" placeholder="Link de MEGA (https://mega.nz/file/...)">
+            <button class="btn-test" onclick="testApi('mega', '/api/download/mega')">Probar Endpoint</button>
+            <div id="res-mega" class="result-box"></div>
+        </div>
+        <button id="copy-mega" class="btn-copy-json mb-6" onclick="copyResult('mega')"><i class="fas fa-copy mr-2"></i> COPIAR JSON</button>
+
     </main>
 
     <script>
@@ -171,7 +184,7 @@
             window.location.href = '/login';
         } else {
             document.addEventListener("DOMContentLoaded", () => {
-                const ids = ['ytaudio', 'tt', 'ig', 'fb'];
+                const ids = ['ytaudio', 'tt', 'ig', 'fb', 'mega'];
                 ids.forEach(id => {
                     const el = document.getElementById(`${id}-path`);
                     if(el) el.innerText += `&apiKey=${userData.key}`;
