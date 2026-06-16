@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const axios = require('axios');
+const { File } = require('megajs');
 
 // GET /api/download/mega?url=https://mega.nz/file/xxx#key
 router.get('/', async (req, res) => {
@@ -14,25 +14,23 @@ router.get('/', async (req, res) => {
     }
 
     try {
-        const response = await axios.get(`https://api.vevioz.com/api/mega?url=${encodeURIComponent(url)}`, {
-            timeout: 30000,
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        const file = File.fromURL(url);
+        await file.loadAttributes();
+
+        res.setHeader('Content-Disposition', `attachment; filename="${file.name}"`);
+        res.setHeader('Content-Type', 'application/octet-stream');
+        res.setHeader('Content-Length', file.size);
+
+        const stream = file.download();
+
+        stream.on('error', (err) => {
+            console.error('Error descargando de MEGA:', err.message);
+            if (!res.headersSent) {
+                res.status(500).json({ status: false, error: err.message });
             }
         });
 
-        const data = response.data;
-
-        if (!data || data.error) {
-            throw new Error(data?.error || 'No se pudo resolver el link de MEGA');
-        }
-
-        return res.json({
-            status: true,
-            creator: 'elvigilante',
-            data,
-            timestamp: new Date().toISOString()
-        });
+        stream.pipe(res);
 
     } catch (error) {
         res.status(500).json({
