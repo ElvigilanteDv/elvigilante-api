@@ -168,8 +168,8 @@
             <div class="flex items-center gap-2 font-bold text-sm uppercase">
                 <i class="fab fa-android text-green-400"></i> APK Mod (AN1)
             </div>
-            <div class="code-box" id="apkmod-path">GET /api/download/apkmod?query=</div>
-            <input id="in-apkmod" class="input-test mb-3" placeholder="Nombre del APK (ej: minecraft, whatsapp...)">
+            <div class="code-box" id="apkmod-path">GET /api/download/apkmod?query=com.mojang.minecraftpe&apiKey=</div>
+            <input id="in-apkmod" class="input-test mb-3" placeholder="Package name (ej: com.mojang.minecraftpe)">
             <button class="btn-test" onclick="testApiQuery('apkmod', '/api/download/apkmod')">Probar Endpoint</button>
             <div id="res-apkmod" class="result-box"></div>
         </div>
@@ -192,7 +192,7 @@
                 const elVideo = document.getElementById('ytvideo-path');
                 if(elVideo) elVideo.innerText += `&apiKey=${userData.key}`;
                 const elApk = document.getElementById('apkmod-path');
-                if(elApk) elApk.innerText += `minecraft&apiKey=${userData.key}`;
+                if(elApk) elApk.innerText += userData.key;
                 setTimeout(() => { document.getElementById('safety-block').style.display = 'none'; }, 300);
             });
         }
