@@ -163,17 +163,17 @@
         </div>
         <button id="copy-fb" class="btn-copy-json mb-6" onclick="copyResult('fb')"><i class="fas fa-copy mr-2"></i> COPIAR JSON</button>
 
-        <!-- MEGA -->
+        <!-- APK Mod -->
         <div class="glass p-6 mb-1 overflow-hidden">
             <div class="flex items-center gap-2 font-bold text-sm uppercase">
-                <i class="fas fa-cloud-download-alt text-cyan-400"></i> MEGA
+                <i class="fab fa-android text-green-400"></i> APK Mod (AN1)
             </div>
-            <div class="code-box" id="mega-path">GET /api/download/mega?url=</div>
-            <input id="in-mega" class="input-test mb-3" placeholder="Link de MEGA (https://mega.nz/file/...)">
-            <button class="btn-test" onclick="testApi('mega', '/api/download/mega')">Probar Endpoint</button>
-            <div id="res-mega" class="result-box"></div>
+            <div class="code-box" id="apkmod-path">GET /api/download/apkmod?query=</div>
+            <input id="in-apkmod" class="input-test mb-3" placeholder="Nombre del APK (ej: minecraft, whatsapp...)">
+            <button class="btn-test" onclick="testApiQuery('apkmod', '/api/download/apkmod')">Probar Endpoint</button>
+            <div id="res-apkmod" class="result-box"></div>
         </div>
-        <button id="copy-mega" class="btn-copy-json mb-6" onclick="copyResult('mega')"><i class="fas fa-copy mr-2"></i> COPIAR JSON</button>
+        <button id="copy-apkmod" class="btn-copy-json mb-6" onclick="copyResult('apkmod')"><i class="fas fa-copy mr-2"></i> COPIAR JSON</button>
 
     </main>
 
@@ -184,13 +184,15 @@
             window.location.href = '/login';
         } else {
             document.addEventListener("DOMContentLoaded", () => {
-                const ids = ['ytaudio', 'tt', 'ig', 'fb', 'mega'];
+                const ids = ['ytaudio', 'tt', 'ig', 'fb'];
                 ids.forEach(id => {
                     const el = document.getElementById(`${id}-path`);
                     if(el) el.innerText += `&apiKey=${userData.key}`;
                 });
                 const elVideo = document.getElementById('ytvideo-path');
                 if(elVideo) elVideo.innerText += `&apiKey=${userData.key}`;
+                const elApk = document.getElementById('apkmod-path');
+                if(elApk) elApk.innerText += `minecraft&apiKey=${userData.key}`;
                 setTimeout(() => { document.getElementById('safety-block').style.display = 'none'; }, 300);
             });
         }
@@ -206,15 +208,31 @@
             const val = document.getElementById(`in-${id}`).value.trim();
             const resBox = document.getElementById(`res-${id}`);
             const copyBtn = document.getElementById(`copy-${id}`);
-
             if (!val) return;
-
             resBox.style.display = 'block';
             resBox.innerText = "SOLICITANDO...";
             copyBtn.style.display = 'none';
-
             try {
                 const response = await fetch(`${route}?url=${encodeURIComponent(val)}&apiKey=${userData.key}`);
+                const data = await response.json();
+                resBox.innerText = JSON.stringify(data, null, 2);
+                copyBtn.style.display = 'block';
+            } catch (err) { 
+                resBox.innerText = "ERROR DE CONEXIÓN"; 
+                copyBtn.style.display = 'block';
+            }
+        }
+
+        async function testApiQuery(id, route) {
+            const val = document.getElementById(`in-${id}`).value.trim();
+            const resBox = document.getElementById(`res-${id}`);
+            const copyBtn = document.getElementById(`copy-${id}`);
+            if (!val) return;
+            resBox.style.display = 'block';
+            resBox.innerText = "BUSCANDO...";
+            copyBtn.style.display = 'none';
+            try {
+                const response = await fetch(`${route}?query=${encodeURIComponent(val)}&apiKey=${userData.key}`);
                 const data = await response.json();
                 resBox.innerText = JSON.stringify(data, null, 2);
                 copyBtn.style.display = 'block';
@@ -229,13 +247,10 @@
             const quality = document.getElementById('quality-ytvideo').value;
             const resBox = document.getElementById('res-ytvideo');
             const copyBtn = document.getElementById('copy-ytvideo');
-
             if (!val) return;
-
             resBox.style.display = 'block';
             resBox.innerText = "SOLICITANDO...";
             copyBtn.style.display = 'none';
-
             try {
                 const response = await fetch(`/api/download/ytvideo?url=${encodeURIComponent(val)}&quality=${quality}&apiKey=${userData.key}`);
                 const data = await response.json();
