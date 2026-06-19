@@ -8,6 +8,7 @@
     "dev": "nodemon index.js"
   },
   "dependencies": {
+    "@distube/ytdl-core": "^4.16.2",
     "apkpure-scraper": "^1.0.6",
     "axios": "^1.6.0",
     "cheerio": "^1.0.0-rc.12",
