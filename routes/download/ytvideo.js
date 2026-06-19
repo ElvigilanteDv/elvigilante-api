@@ -32,7 +32,7 @@ router.get('/', async (req, res) => {
 
         return res.json({
             status: true,
-            creator: 'elvigilante',
+            creator: 'Elvigilante',
             result: {
                 title: info.videoDetails.title,
                 duration: info.videoDetails.lengthSeconds,
