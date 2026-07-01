@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
+const nodemailer = require('nodemailer');
 const { generateKey } = require('../middlewares/auth');
 
 // ============== CONFIGURACIÓN ==============
@@ -51,6 +52,43 @@ const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 let startTime = Date.now();
 
+// ============== CONFIGURACIÓN DE CORREO ==============
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
+
+async function sendWelcomeEmail(email, username, apiKey) {
+    const mailOptions = {
+        from: `"DvWilkerOFC API" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: '¡Bienvenido a DvWilkerOFC API!',
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
+                <h2 style="color: #00f3ff; text-align: center;">¡Bienvenido, ${username}!</h2>
+                <p>Tu cuenta ha sido creada exitosamente en <strong>DvWilkerOFC API</strong>.</p>
+                <div style="background: #f4f4f4; padding: 15px; border-radius: 5px; text-align: center;">
+                    <p style="margin: 0; font-weight: bold;">TU API KEY:</p>
+                    <code style="font-size: 1.2em; color: #d63384;">${apiKey}</code>
+                </div>
+                <p>Guarda esta llave de forma segura, la necesitarás para acceder a nuestros servicios.</p>
+                <hr>
+                <p style="font-size: 0.8em; color: #777;">Si no te registraste en nuestro sitio, ignora este correo.</p>
+            </div>
+        `
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`✅ Correo de bienvenida enviado a: ${email}`);
+    } catch (error) {
+        console.error(`❌ Error enviando correo a ${email}:`, error.message);
+    }
+}
+
 // ============== FUNCIÓN PARA VERIFICAR EXPIRACIÓN ==============
 async function verificarExpiracion(user) {
     if (user.vipExpires && new Date() > new Date(user.vipExpires)) {
@@ -97,6 +135,10 @@ router.post('/register', async (req, res) => {
         });
 
         await newUser.save();
+
+        // Enviar correo de bienvenida (no bloquea la respuesta del registro)
+        sendWelcomeEmail(email, username, newUser.key);
+
         res.json({ status: true, creator: "Félix Ofc", message: "Registro exitoso", key: newUser.key });
     } catch (err) {
         console.error(err);
