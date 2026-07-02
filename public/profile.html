@@ -148,13 +148,14 @@
         .plan-card {
             background: var(--bg-primary);
             border-radius: 20px;
-            padding: 24px 28px;
-            margin-bottom: 16px;
+            padding: 28px 28px;
+            margin-bottom: 18px;
             border: 1px solid rgba(0,0,0,0.02);
             transition: var(--transition);
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 24px;
+            text-align: center;
         }
 
         body.dark-mode .plan-card {
@@ -162,7 +163,7 @@
         }
 
         .plan-card:hover {
-            transform: translateX(6px);
+            transform: translateY(-4px);
             border-color: var(--accent);
             box-shadow: 0 8px 24px rgba(0,0,0,0.04);
         }
@@ -172,12 +173,13 @@
         }
 
         .plan-card .plan-icon {
-            width: 64px;
-            height: 64px;
-            border-radius: 16px;
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
             flex-shrink: 0;
             object-fit: cover;
             border: 2px solid rgba(0,0,0,0.04);
+            margin-bottom: 16px;
         }
 
         body.dark-mode .plan-card .plan-icon {
@@ -185,64 +187,70 @@
         }
 
         .plan-card .plan-info {
-            flex: 1;
+            width: 100%;
         }
 
         .plan-card .plan-info h3 {
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             font-weight: 800;
-            margin: 0 0 4px 0;
+            margin: 0 0 8px 0;
             letter-spacing: -0.3px;
         }
 
         .plan-card .plan-info .plan-desc {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--text-secondary);
-            margin: 0 0 4px 0;
-            line-height: 1.5;
+            margin: 0 0 12px 0;
+            line-height: 1.6;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .plan-card .plan-info .plan-features {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
             display: flex;
-            gap: 16px;
+            justify-content: center;
+            gap: 20px;
             flex-wrap: wrap;
-            margin-top: 4px;
+            margin-bottom: 16px;
         }
 
         .plan-card .plan-info .plan-features span {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
         }
 
         .plan-card .plan-info .plan-features i {
             color: var(--accent);
-            font-size: 0.7rem;
+            font-size: 0.75rem;
         }
 
         .plan-card .plan-price {
-            text-align: right;
-            flex-shrink: 0;
-            min-width: 120px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
         }
 
         .plan-card .plan-price .price {
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             font-weight: 800;
             color: #22c55e;
             letter-spacing: -0.5px;
         }
 
         .plan-card .plan-price .price-label {
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             color: var(--text-muted);
             font-weight: 600;
         }
 
         .plan-card .plan-price .btn-whatsapp {
-            margin-top: 6px;
+            margin-top: 4px;
         }
 
         header {
@@ -438,20 +446,21 @@
                 width: 100%;
             }
             .plan-card {
-                flex-direction: column;
-                text-align: center;
-                padding: 20px;
-            }
-            .plan-card .plan-price {
-                text-align: center;
-                width: 100%;
+                padding: 20px 16px;
             }
             .plan-card .plan-icon {
-                width: 56px;
-                height: 56px;
+                width: 80px;
+                height: 80px;
             }
             .plan-card .plan-info .plan-features {
-                justify-content: center;
+                gap: 10px;
+                font-size: 0.7rem;
+            }
+            .plan-card .plan-info h3 {
+                font-size: 1.1rem;
+            }
+            .plan-card .plan-info .plan-desc {
+                font-size: 0.8rem;
             }
         }
     </style>
