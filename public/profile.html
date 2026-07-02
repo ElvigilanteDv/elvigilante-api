@@ -406,9 +406,8 @@
 
     <main class="container mx-auto p-4 max-w-2xl pb-12">
 
-        <!-- Perfil -->
         <div class="card p-8 mt-6 text-center">
-            <img id="view-img" src="https://files.catbox.moe/9ssbf9.jpg" class="avatar mx-auto" alt="Avatar">
+            <img id="view-img" src="https://i.ibb.co/jPzxnp6x/NAGI-REO-RIN-SAE-ISAGI.jpg" class="avatar mx-auto" alt="Avatar">
             <h2 id="view-username" class="text-2xl font-black mt-4">---</h2>
             <p id="view-id" class="text-sm font-medium text-[var(--text-muted)] mt-1">---</p>
             <div class="mt-3">
@@ -416,7 +415,6 @@
             </div>
         </div>
 
-        <!-- Estadísticas -->
         <div class="grid grid-cols-2 gap-4 mt-6">
             <div class="stat-box">
                 <div class="stat-label"><i class="fas fa-crown" style="margin-right:4px;"></i> Plan</div>
@@ -428,13 +426,11 @@
             </div>
         </div>
 
-        <!-- Planes VIP -->
         <div class="card p-8 mt-8">
             <div class="section-title">
                 <i class="fas fa-crown"></i> Mejora tu Plan
             </div>
 
-            <!-- VIP -->
             <div class="plan-card">
                 <div class="flex justify-between items-center flex-wrap gap-2">
                     <div>
@@ -451,7 +447,6 @@
                 </div>
             </div>
 
-            <!-- PRO -->
             <div class="plan-card">
                 <div class="flex justify-between items-center flex-wrap gap-2">
                     <div>
@@ -468,7 +463,6 @@
                 </div>
             </div>
 
-            <!-- PREMIUM -->
             <div class="plan-card">
                 <div class="flex justify-between items-center flex-wrap gap-2">
                     <div>
@@ -485,7 +479,6 @@
                 </div>
             </div>
 
-            <!-- ADMIN -->
             <div class="plan-card admin">
                 <div class="flex justify-between items-center flex-wrap gap-2">
                     <div>
@@ -506,7 +499,6 @@
             </div>
         </div>
 
-        <!-- Editar Datos -->
         <div class="card p-8 mt-8">
             <div class="section-title">
                 <i class="fas fa-pen"></i> Editar Datos
@@ -576,7 +568,6 @@
         }
 
         async function loadProfile() {
-            // Cargar tema guardado
             const savedTheme = localStorage.getItem('kazuma-theme');
             if (savedTheme === 'dark') {
                 document.body.classList.add('dark-mode');
@@ -600,20 +591,17 @@
                         document.getElementById('view-img').src = u.profile_img;
                     }
 
-                    // Badge del plan
                     const badge = document.getElementById('view-plan-badge');
                     const plan = u.plan?.toUpperCase() || 'FREE';
                     badge.innerText = plan;
 
-                    // Clase según plan
                     badge.className = 'badge-plan';
                     if (plan === 'VIP') badge.classList.add('badge-vip');
                     else if (plan === 'PRO') badge.classList.add('badge-pro');
                     else if (plan === 'PREMIUM') badge.classList.add('badge-premium');
-                    else if (plan === 'ADMIN') badge.classList.add('badge-admin');
+                    else if (plan === 'ADMIN' || plan === 'ADMIN VIP') badge.classList.add('badge-admin');
                     else badge.classList.add('badge-free');
 
-                    // Guardar datos actualizados
                     const updatedUser = { ...userData, ...u };
                     localStorage.setItem('kazuma_user', JSON.stringify(updatedUser));
                     Object.assign(userData, updatedUser);
@@ -622,7 +610,6 @@
                 console.error('Error al cargar perfil:', e);
             }
 
-            // Ocultar safety block
             document.getElementById('safety-block').classList.add('hidden');
         }
 
@@ -683,7 +670,6 @@
                         }
                     });
 
-                    // Limpiar input
                     input.value = '';
                 } else {
                     throw new Error(data.message || 'Error al actualizar');
@@ -736,7 +722,6 @@
             });
         }
 
-        // ============== WHATSAPP ==============
         function comprarWhatsApp(plan, precio, beneficios) {
             const mensaje = `Hola, quiero información sobre el plan ${plan} de $${precio} USD. Beneficios: ${beneficios}. Mi usuario es: ${userData.username}. Mi email es: ${userData.email}. Gracias!`;
             const url = `https://wa.me/59177474230?text=${encodeURIComponent(mensaje)}`;
