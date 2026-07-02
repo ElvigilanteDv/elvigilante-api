@@ -89,8 +89,8 @@ const generateKey = () => {
         }
         return result;
     };
-    // Genera 10 caracteres aleatorios después de "Edward"
-    return `Edward${gen(10)}`;
+    // Genera 8 caracteres aleatorios después de "Edward"
+    return `Edward${gen(8)}`;
 };
 
 module.exports = { authHandler, generateKey };
