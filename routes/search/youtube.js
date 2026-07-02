@@ -14,29 +14,31 @@ async function ytsearch(query) {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                 "Accept-Language": "en-US,en;q=0.9",
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                // Pedimos la respuesta comprimida: la página de resultados de YouTube
+                // es pesada (varios MB sin comprimir), esto reduce mucho el tiempo de red.
+                "Accept-Encoding": "gzip, deflate, br",
             },
-            timeout: 30000,
+            // 30s era demasiado margen para una sola petición HTML.
+            timeout: 8000,
         });
 
-        // Extraer datos del HTML usando regex
         const html = response.data;
-        
-        // Buscar el JSON de datos iniciales de YouTube
+
         const initialDataMatch = html.match(/var ytInitialData = ({.+?});/);
         if (!initialDataMatch) {
             throw new Error("No se pudieron extraer los videos.");
         }
 
         const initialData = JSON.parse(initialDataMatch[1]);
-        
-        // Navegar por la estructura de YouTube para encontrar los videos
+
         const contents = initialData?.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.contents || [];
-        
+
         const videos = [];
-        
+
+        outer:
         for (const content of contents) {
             const itemSection = content?.itemSectionRenderer?.contents || [];
-            
+
             for (const item of itemSection) {
                 const videoRenderer = item?.videoRenderer;
                 if (videoRenderer) {
@@ -49,7 +51,7 @@ async function ytsearch(query) {
                     const thumbnail = videoRenderer?.thumbnail?.thumbnails?.[0]?.url || "";
                     const author = videoRenderer?.ownerText?.runs?.[0]?.text || "Desconocido";
                     const authorId = videoRenderer?.ownerText?.runs?.[0]?.navigationEndpoint?.browseEndpoint?.browseId || "";
-                    
+
                     if (videoId && title) {
                         videos.push({
                             title: title,
@@ -61,20 +63,21 @@ async function ytsearch(query) {
                             author: author,
                             authorId: authorId,
                             publishedAt: publishedAt,
-                            description: description.substring(0, 200) // Limitar descripción
+                            description: description.substring(0, 200)
                         });
                     }
-                    
-                    if (videos.length >= 10) break;
+
+                    // Cortamos ambos loops apenas llegamos a 10, en vez de seguir
+                    // iterando el resto del contenido innecesariamente.
+                    if (videos.length >= 10) break outer;
                 }
             }
-            if (videos.length >= 10) break;
         }
 
         if (videos.length === 0) {
             throw new Error("No se encontraron videos.");
         }
-        
+
         return videos;
     } catch (error) {
         throw new Error(error.message);
@@ -87,6 +90,7 @@ router.get('/', async (req, res) => {
     if (!query || query.trim().length === 0) {
         return res.status(400).json({
             status: false,
+            creator: "Edward",
             error: "El parámetro query es requerido"
         });
     }
@@ -94,6 +98,7 @@ router.get('/', async (req, res) => {
     if (query.length > 100) {
         return res.status(400).json({
             status: false,
+            creator: "Edward",
             error: "La búsqueda es demasiado larga"
         });
     }
@@ -102,13 +107,14 @@ router.get('/', async (req, res) => {
         const result = await ytsearch(query.trim());
         res.json({
             status: true,
-            creator: "elvigilante",
+            creator: "Edward",
             data: result,
             timestamp: new Date().toISOString()
         });
     } catch (error) {
         res.status(500).json({
             status: false,
+            creator: "Edward",
             error: error.message || "Internal Server Error"
         });
     }
