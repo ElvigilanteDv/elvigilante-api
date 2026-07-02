@@ -1,6 +1,6 @@
 [
   {
-    "username": "elvigilante",
+    "username": "edward",
     "email": "cololacalempira5@gmail.com",
     "password": "elvigilante",
     "key": "edward",
@@ -9,6 +9,7 @@
     "limit": 100000,
     "requestToday": 0,
     "totalRequest": 0,
-    "lastRequestDate": "2026-05-07"
+    "lastRequestDate": "2026-05-07",
+    "profile_img": "https://i.ibb.co/jPzxnp6x/NAGI-REO-RIN-SAE-ISAGI.jpg"
   }
 ]
