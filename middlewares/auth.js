@@ -19,7 +19,7 @@ const authHandler = async (req, res, next) => {
         try {
             const adminData = JSON.parse(fs.readFileSync(adminPath, 'utf-8'));
             adminUser = Array.isArray(adminData) ? adminData[0] : adminData;
-            
+
             if (adminUser && adminUser.key === apiKey) {
                 // Admin no tiene límite, solo pasa
                 req.user = adminUser;
@@ -32,7 +32,7 @@ const authHandler = async (req, res, next) => {
         // Buscar en MongoDB
         const User = mongoose.model('User');
         let user = await User.findOne({ key: apiKey });
-        
+
         if (!user) {
             return res.status(401).json({ status: false, message: "API Key inválida" });
         }
@@ -76,6 +76,10 @@ const authHandler = async (req, res, next) => {
     }
 };
 
+/**
+ * Genera una API key con formato Edward + caracteres aleatorios
+ * Ejemplo: Edward7aB3cD9fG1h
+ */
 const generateKey = () => {
     const gen = (len) => {
         const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -85,7 +89,8 @@ const generateKey = () => {
         }
         return result;
     };
-    return `dwk-${gen(8)}-${gen(8)}`;
+    // Genera 10 caracteres aleatorios después de "Edward"
+    return `Edward${gen(10)}`;
 };
 
 module.exports = { authHandler, generateKey };
