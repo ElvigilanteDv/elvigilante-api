@@ -3,125 +3,663 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Herramientas | elvigilante API</title>
+    <title>Herramientas · Edward</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.google.com/recaptcha/api.js?render=6Lfw-dwsAAAAACc6y5K4sfFnplSqbskYPia1ADh5"></script>
 
     <style>
-        :root { --neon-blue: #00f3ff; --dark-bg: #09090b; --card-bg: #11111d; --text-main: #ffffff; --code-bg: #05050a; }
-        body { background-color: var(--dark-bg); color: var(--text-main); font-family: 'Inter', sans-serif; }
-        #safety-block { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
-        .glass { background: var(--card-bg); border: 1px solid rgba(0, 243, 255, 0.1); border-radius: 24px; }
-        .code-box { background: var(--code-bg); padding: 12px; border-radius: 12px; font-family: monospace; font-size: 0.7rem; color: var(--neon-blue); border: 1px solid rgba(0,243,255,0.1); word-break: break-all; margin: 15px 0; }
-        .input-test, select { width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); padding: 14px; border-radius: 12px; color: #fff; outline: none; margin-bottom: 10px; font-size: 0.8rem; }
-        .btn-test { background: var(--neon-blue); color: #000; border: none; padding: 14px; width: 100%; border-radius: 12px; font-weight: 900; text-transform: uppercase; cursor: pointer; transition: 0.3s; }
-        .btn-test:hover { filter: brightness(1.2); transform: scale(1.01); }
-        .img-result { width: 100%; border-radius: 15px; border: 2px solid var(--neon-blue); display: none; margin-top: 15px; }
-        .result-box { 
-            background: var(--code-bg); color: #00ffcc; padding: 15px; border-radius: 12px; 
-            margin-top: 15px; font-size: 0.7rem; font-family: monospace; 
-            border: 1px solid rgba(0, 255, 204, 0.1); white-space: pre-wrap; 
-            word-break: break-all; max-height: 300px; overflow-y: auto; display: none;
+        :root {
+            --bg-primary: #0a0b0e;
+            --bg-card: #14161c;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #475569;
+            --accent: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-gradient: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --radius: 24px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
+        body.light-mode {
+            --bg-primary: #f0f2f5;
+            --bg-card: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            transition: background var(--transition), color var(--transition);
+            min-height: 100vh;
+        }
+
+        #safety-block {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            z-index: 10000;
+            transition: opacity 0.5s ease;
+        }
+
+        #safety-block.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        header {
+            background: var(--bg-card);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: var(--shadow);
+            transition: background var(--transition), box-shadow var(--transition);
+        }
+
+        body.light-mode header {
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .brand {
+            font-weight: 800;
+            font-size: 1.1rem;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .brand span {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand i {
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        .theme-toggle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-secondary);
+            border: none;
+            font-size: 0.9rem;
+        }
+
+        .theme-toggle:hover {
+            background: var(--accent);
+            color: white;
+            transform: rotate(20deg);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn-back {
+            font-size: 0.7rem;
+            font-weight: 700;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.04);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+
+        body.light-mode .btn-back {
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .btn-back:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 1px solid rgba(0,0,0,0.02);
+            box-shadow: var(--shadow);
+            transition: all var(--transition);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        body.light-mode .card {
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+
+        .card-header {
+            padding: 18px 24px 14px;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        body.light-mode .card-header {
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .card-header .icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .card-header .icon.camera { background: rgba(59, 130, 246, 0.1); color: var(--accent); }
+        .card-header .icon.qr { background: rgba(139, 92, 246, 0.1); color: var(--accent-purple); }
+        .card-header .icon.tts { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+        .card-header .icon.gacha { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+
+        .card-header h3 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .card-header .badge {
+            font-size: 0.55rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 2px 12px;
+            border-radius: 20px;
+            background: var(--bg-primary);
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        .card-body {
+            padding: 18px 24px 20px;
+        }
+
+        .card-body .desc {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .card-body .desc i {
+            color: var(--accent);
+            font-size: 0.7rem;
+        }
+
+        .code-box {
+            background: var(--bg-primary);
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', 'Menlo', monospace;
+            font-size: 0.65rem;
+            color: var(--accent);
+            border: 1px solid rgba(0,0,0,0.04);
+            word-break: break-all;
+            margin-bottom: 14px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        body.light-mode .code-box {
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .input-test {
+            width: 100%;
+            background: var(--bg-primary);
+            border: 1.5px solid transparent;
+            padding: 12px 16px;
+            border-radius: 14px;
+            color: var(--text-primary);
+            outline: none;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .input-test::placeholder {
+            color: var(--text-muted);
+        }
+
+        .input-test:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+        }
+
+        .input-test.textarea {
+            min-height: 80px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        select.input-test {
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-test {
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
+        }
+
+        .btn-test:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25);
+        }
+
+        .btn-test:active {
+            transform: translateY(0);
+        }
+
+        .btn-test.green { background: linear-gradient(135deg, #22c55e, #16a34a); }
+        .btn-test.purple { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
+        .btn-test.gold { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+        .btn-test.secondary {
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            border: 1.5px solid rgba(0,0,0,0.04);
+            box-shadow: none;
+        }
+
+        body.light-mode .btn-test.secondary {
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .btn-test.secondary:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        .btn-group-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .gender-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .gender-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 14px;
+            border: 1.5px solid transparent;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .gender-btn:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        .gender-btn.active {
+            background: var(--accent-gradient);
+            color: white;
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        .img-result {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 14px;
+            border: 2px solid rgba(0,0,0,0.04);
+            display: none;
+            margin-top: 14px;
+        }
+
+        body.light-mode .img-result {
+            border: 2px solid rgba(0,0,0,0.04);
+        }
+
+        .img-result.qr-result {
+            max-width: 200px;
+            display: block;
+            margin: 14px auto 0;
+        }
+
+        .audio-player {
+            width: 100%;
+            margin-top: 14px;
+            border-radius: 12px;
+            display: none;
+            accent-color: var(--accent);
+        }
+
+        .audio-player::-webkit-media-controls-panel {
+            background: var(--bg-primary);
+        }
+
+        .result-box {
+            background: var(--bg-primary);
+            color: #22d3ee;
+            padding: 16px;
+            border-radius: 14px;
+            margin-top: 14px;
+            font-size: 0.65rem;
+            font-family: 'JetBrains Mono', 'Menlo', monospace;
+            border: 1px solid rgba(0,0,0,0.04);
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 350px;
+            overflow-y: auto;
+            display: none;
+            line-height: 1.6;
+        }
+
+        body.light-mode .result-box {
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .result-box::-webkit-scrollbar { width: 4px; }
+        .result-box::-webkit-scrollbar-track { background: transparent; }
+        .result-box::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
         .btn-copy-json {
-            background: rgba(255, 255, 255, 0.05); color: var(--text-main);
-            width: 100%; padding: 10px; border-radius: 0 0 15px 15px;
-            font-size: 10px; font-weight: 800; border-top: 1px solid rgba(255,255,255,0.05);
-            display: none; cursor: pointer; transition: 0.3s;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            width: 100%;
+            padding: 10px;
+            border-radius: 0 0 var(--radius) var(--radius);
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: none;
+            border: none;
+            border-top: 1px solid rgba(0,0,0,0.04);
+            cursor: pointer;
+            transition: var(--transition);
         }
-        .btn-copy-json:hover { background: rgba(0, 243, 255, 0.1); color: var(--neon-blue); }
-        h2 { border-left: 5px solid var(--neon-blue); padding-left: 15px; font-weight: 900; }
-        .grecaptcha-badge { width: 70px !important; overflow: hidden !important; transition: 0.3s !important; right: 0px !important; bottom: 20px !important; z-index: 9999 !important; }
-        .rarity-badge { display: inline-block; padding: 4px 8px; border-radius: 8px; font-size: 10px; font-weight: bold; }
-        .rarity-SSR { background: #ffd700; color: #000; }
-        .rarity-SR { background: #c0c0c0; color: #000; }
-        .rarity-R { background: #cd7f32; color: #000; }
-        .gender-selector { display: flex; gap: 8px; margin-bottom: 12px; }
-        .gender-btn { flex: 1; padding: 10px; border-radius: 12px; border: 1px solid rgba(0,243,255,0.2); background: rgba(0,243,255,0.05); color: #fff; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
-        .gender-btn.active { background: var(--neon-blue); color: #000; border-color: var(--neon-blue); }
-        .audio-player { width: 100%; margin-top: 15px; border-radius: 12px; display: none; accent-color: var(--neon-blue); }
+
+        body.light-mode .btn-copy-json {
+            border-top: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .btn-copy-json:hover {
+            color: var(--accent);
+            background: rgba(59, 130, 246, 0.04);
+        }
+
+        .page-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            padding: 0 4px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-title i {
+            color: var(--accent);
+        }
+
+        .grecaptcha-badge {
+            z-index: 9999 !important;
+        }
+
+        @media (max-width: 480px) {
+            .card-header { padding: 14px 16px; }
+            .card-body { padding: 14px 16px; }
+            .code-box { font-size: 0.55rem; padding: 8px 12px; }
+            .page-title { font-size: 1.1rem; }
+            .input-grid { grid-template-columns: 1fr; }
+            .btn-group-grid { grid-template-columns: 1fr; }
+            .gender-selector { flex-direction: row; }
+            .result-box { font-size: 0.55rem; max-height: 200px; }
+            .img-result.qr-result { max-width: 150px; }
+        }
     </style>
 </head>
-<body class="min-h-screen pb-10">
+<body>
+
     <div id="safety-block"></div>
-    <header class="p-4 flex justify-between items-center sticky top-0 z-50 bg-[#09090b]/80 backdrop-blur-md border-b border-white/5">
-        <div class="font-black text-xl tracking-tighter cursor-pointer" onclick="location.href='/dash'">ELVIGILANTE <span style="color: var(--neon-blue)">DASH</span></div>
-        <button onclick="location.href='/dash'" class="text-xs font-bold bg-white/5 px-4 py-2 rounded-xl border border-white/10"><i class="fas fa-home"></i></button>
+
+    <header>
+        <div class="brand" onclick="location.href='/dash'">
+            <i class="fas fa-crown"></i>
+            <span>Edward</span>
+        </div>
+        <div class="header-actions">
+            <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn" aria-label="Toggle theme">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="btn-back" onclick="location.href='/dash'">
+                <i class="fas fa-arrow-left"></i> Volver
+            </button>
+        </div>
     </header>
 
-    <main class="container mx-auto p-4 max-w-2xl">
-        <h2 class="text-xl uppercase tracking-tighter my-6">Herramientas</h2>
+    <main class="container mx-auto p-4 max-w-2xl pb-12">
+        <div class="page-title">
+            <i class="fas fa-tools"></i> Herramientas
+        </div>
 
         <!-- Screenshot Web -->
-        <div class="glass p-6 mb-6">
-            <div class="font-bold text-sm uppercase mb-2"><i class="fas fa-camera text-cyan-400"></i> Screenshot Web</div>
-            <div class="code-box" id="ss-path">GET /api/tools/ssweb?apiKey=</div>
-            <input id="url-ss" class="input-test" placeholder="URL del sitio...">
-            <div class="grid grid-cols-2 gap-3">
-                <select id="device-ss"><option value="desktop">Escritorio</option><option value="tablet">Tablet</option><option value="phone">Móvil</option></select>
-                <select id="theme-ss"><option value="dark">Dark</option><option value="light">Light</option></select>
+        <div class="card">
+            <div class="card-header">
+                <div class="icon camera"><i class="fas fa-camera"></i></div>
+                <h3>Screenshot Web</h3>
+                <span class="badge">Imagen</span>
             </div>
-            <button class="btn-test" onclick="testMedia('ssweb')">Capturar Pantalla</button>
-            <img id="view-ssweb" class="img-result">
+            <div class="card-body">
+                <p class="desc"><i class="fas fa-info-circle"></i> Captura la pantalla de cualquier sitio web.</p>
+                <div class="code-box" id="ss-path">GET /api/tools/ssweb?apiKey=</div>
+                <input id="url-ss" class="input-test" placeholder="URL del sitio web...">
+                <div class="input-grid">
+                    <select id="device-ss" class="input-test">
+                        <option value="desktop">🖥️ Escritorio</option>
+                        <option value="tablet">📱 Tablet</option>
+                        <option value="phone">📱 Móvil</option>
+                    </select>
+                    <select id="theme-ss" class="input-test">
+                        <option value="dark">🌙 Dark</option>
+                        <option value="light">☀️ Light</option>
+                    </select>
+                </div>
+                <button class="btn-test" onclick="testMedia('ssweb')">
+                    <i class="fas fa-camera mr-2"></i> Capturar
+                </button>
+                <img id="view-ssweb" class="img-result">
+            </div>
         </div>
 
         <!-- QR Generator -->
-        <div class="glass p-6 mb-6">
-            <div class="font-bold text-sm uppercase mb-2"><i class="fas fa-qrcode text-cyan-400"></i> QR Generator</div>
-            <div class="code-box" id="qr-path">GET /api/tools/qr?apiKey=</div>
-            <input id="text-qr" class="input-test" placeholder="Texto o URL...">
-            <button class="btn-test" onclick="testMedia('qr')">Generar QR</button>
-            <div class="text-center"><img id="view-qr" class="img-result mx-auto !w-48"></div>
+        <div class="card">
+            <div class="card-header">
+                <div class="icon qr"><i class="fas fa-qrcode"></i></div>
+                <h3>QR Generator</h3>
+                <span class="badge">Imagen</span>
+            </div>
+            <div class="card-body">
+                <p class="desc"><i class="fas fa-info-circle"></i> Genera un código QR a partir de texto o URL.</p>
+                <div class="code-box" id="qr-path">GET /api/tools/qr?apiKey=</div>
+                <input id="text-qr" class="input-test" placeholder="Texto o URL...">
+                <button class="btn-test purple" onclick="testMedia('qr')">
+                    <i class="fas fa-qrcode mr-2"></i> Generar QR
+                </button>
+                <img id="view-qr" class="img-result qr-result">
+            </div>
         </div>
 
         <!-- TTS -->
-        <div class="glass p-6 mb-1 overflow-hidden">
-            <div class="font-bold text-sm uppercase mb-2"><i class="fas fa-microphone text-cyan-400"></i> Text to Speech</div>
-            <div class="code-box" id="tts-path">GET /api/tools/tts?apiKey=</div>
-            <p class="text-xs text-white/40 mb-3">Convierte texto en voz. Elige el género:</p>
-            <div class="gender-selector">
-                <button class="gender-btn active" id="btn-mujer" onclick="setGenero('mujer')">👩 Mujer</button>
-                <button class="gender-btn" id="btn-hombre" onclick="setGenero('hombre')">👨 Hombre</button>
+        <div class="card">
+            <div class="card-header">
+                <div class="icon tts"><i class="fas fa-microphone"></i></div>
+                <h3>Text to Speech</h3>
+                <span class="badge">Audio</span>
             </div>
-            <textarea id="texto-tts" class="input-test" rows="3" placeholder="Escribe el texto que quieres escuchar..." style="resize:none; height:90px;"></textarea>
-            <button class="btn-test" onclick="testTTS()">🎙️ Generar Voz</button>
-            <audio id="audio-tts" class="audio-player" controls></audio>
+            <div class="card-body">
+                <p class="desc"><i class="fas fa-info-circle"></i> Convierte texto en voz. Elige el género.</p>
+                <div class="code-box" id="tts-path">GET /api/tools/tts?apiKey=</div>
+                <div class="gender-selector">
+                    <button class="gender-btn active" id="btn-mujer" onclick="setGenero('mujer')">👩 Mujer</button>
+                    <button class="gender-btn" id="btn-hombre" onclick="setGenero('hombre')">👨 Hombre</button>
+                </div>
+                <textarea id="texto-tts" class="input-test textarea" placeholder="Escribe el texto que quieres escuchar..."></textarea>
+                <button class="btn-test green" onclick="testTTS()">
+                    <i class="fas fa-play mr-2"></i> Generar Voz
+                </button>
+                <audio id="audio-tts" class="audio-player" controls></audio>
+            </div>
         </div>
-        <div class="mb-6"></div>
 
         <!-- Gacha System -->
-        <div class="glass p-6 mb-6 overflow-hidden">
-            <div class="font-bold text-sm uppercase mb-2"><i class="fas fa-dice-d6 text-cyan-400"></i> Gacha System (Anime)</div>
-            <div class="code-box" id="gacha-path">GET /api/tools/gacha/pull?apiKey=</div>
-            <div class="flex gap-3 mb-3">
-                <button class="btn-test" onclick="testGacha('pull')"><i class="fas fa-hand-fist"></i> 1 Pull</button>
-                <button class="btn-test" onclick="testGacha('multipull')"><i class="fas fa-layer-group"></i> 10 Pulls</button>
+        <div class="card">
+            <div class="card-header">
+                <div class="icon gacha"><i class="fas fa-dice-d6"></i></div>
+                <h3>Gacha System</h3>
+                <span class="badge">Anime</span>
             </div>
-            <div class="grid grid-cols-2 gap-3 mb-3">
-                <button class="btn-test bg-white/10 hover:bg-white/20" onclick="testGacha('characters')"><i class="fas fa-users"></i> Ver Personajes</button>
-                <button class="btn-test bg-white/10 hover:bg-white/20" onclick="testGacha('stats')"><i class="fas fa-chart-line"></i> Estadísticas</button>
+            <div class="card-body">
+                <p class="desc"><i class="fas fa-info-circle"></i> Sistema de gacha con personajes de anime.</p>
+                <div class="code-box" id="gacha-path">GET /api/tools/gacha/pull?apiKey=</div>
+                <div class="btn-group-grid">
+                    <button class="btn-test gold" onclick="testGacha('pull')">
+                        <i class="fas fa-hand-fist mr-1"></i> 1 Pull
+                    </button>
+                    <button class="btn-test gold" onclick="testGacha('multipull')">
+                        <i class="fas fa-layer-group mr-1"></i> 10 Pulls
+                    </button>
+                </div>
+                <div class="btn-group-grid">
+                    <button class="btn-test secondary" onclick="testGacha('characters')">
+                        <i class="fas fa-users mr-1"></i> Personajes
+                    </button>
+                    <button class="btn-test secondary" onclick="testGacha('stats')">
+                        <i class="fas fa-chart-line mr-1"></i> Estadísticas
+                    </button>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <input id="search-character" class="input-test" placeholder="Buscar personaje..." style="flex:1;">
+                    <button class="btn-test secondary" onclick="testGacha('search')" style="width:auto; padding:12px 20px;">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <div id="result-gacha" class="result-box"></div>
             </div>
-            <input id="search-character" class="input-test" placeholder="Buscar personaje...">
-            <button class="btn-test bg-white/5" onclick="testGacha('search')"><i class="fas fa-search"></i> Buscar</button>
-            <div id="result-gacha" class="result-box"></div>
+            <button id="copy-gacha" class="btn-copy-json" onclick="copyResult('gacha')">
+                <i class="fas fa-copy mr-2"></i> Copiar JSON
+            </button>
         </div>
-        <button id="copy-gacha" class="btn-copy-json mb-6" onclick="copyResult('gacha')"><i class="fas fa-copy mr-2"></i> COPIAR JSON</button>
 
     </main>
 
     <script>
         const userData = JSON.parse(localStorage.getItem('kazuma_user'));
-        if (!userData) { window.location.href = '/login'; }
-        else {
+
+        if (!userData) {
+            window.location.href = '/login';
+        } else {
             document.addEventListener("DOMContentLoaded", () => {
+                // Cargar tema
+                const savedTheme = localStorage.getItem('kazuma-theme');
+                if (savedTheme === 'light') {
+                    document.body.classList.add('light-mode');
+                    document.getElementById('theme-btn').querySelector('i').classList.replace('fa-moon', 'fa-sun');
+                }
+
+                // Actualizar paths con API key
                 document.getElementById('ss-path').innerText += `${userData.key}&url=...&device=...&theme=...`;
                 document.getElementById('qr-path').innerText += `${userData.key}&text=...`;
                 document.getElementById('tts-path').innerText += `${userData.key}&texto=...&genero=mujer`;
                 document.getElementById('gacha-path').innerText = `GET /api/tools/gacha/pull?apiKey=${userData.key}`;
-                setTimeout(() => document.getElementById('safety-block').style.display='none', 300);
+
+                // Ocultar safety block
+                setTimeout(() => {
+                    document.getElementById('safety-block').classList.add('hidden');
+                }, 400);
             });
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.getElementById('theme-btn');
+            const icon = btn.querySelector('i');
+
+            body.classList.toggle('light-mode');
+
+            if (body.classList.contains('light-mode')) {
+                icon.classList.replace('fa-moon', 'fa-sun');
+                localStorage.setItem('kazuma-theme', 'light');
+            } else {
+                icon.classList.replace('fa-sun', 'fa-moon');
+                localStorage.setItem('kazuma-theme', 'dark');
+            }
         }
 
         let generoTTS = 'mujer';
@@ -136,9 +674,25 @@
             const texto = document.getElementById('texto-tts').value.trim();
             const audio = document.getElementById('audio-tts');
 
-            if (!texto) return Swal.fire({ icon: 'warning', title: 'Escribe algo', background: '#11111d', color: '#fff' });
+            if (!texto) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Escribe algo',
+                    text: 'Ingresa el texto que quieres escuchar',
+                    background: 'var(--bg-card)',
+                    color: 'var(--text-primary)',
+                    confirmButtonColor: '#3b82f6'
+                });
+                return;
+            }
 
-            Swal.fire({ title: 'Generando voz...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            Swal.fire({
+                title: 'Generando voz...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading(),
+                background: 'var(--bg-card)',
+                color: 'var(--text-primary)'
+            });
 
             try {
                 const url = `/api/tools/tts?texto=${encodeURIComponent(texto)}&genero=${generoTTS}&apiKey=${userData.key}`;
@@ -153,67 +707,162 @@
                 audio.play();
             } catch (e) {
                 Swal.close();
-                Swal.fire({ icon: 'error', title: 'Error', text: e.message, background: '#11111d', color: '#fff' });
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: e.message,
+                    background: 'var(--bg-card)',
+                    color: 'var(--text-primary)',
+                    confirmButtonColor: '#3b82f6'
+                });
             }
         }
 
         async function testMedia(type) {
             const imgEl = document.getElementById(`view-${type}`);
             let finalUrl = "";
-            if(type === 'ssweb') {
-                const u = document.getElementById('url-ss').value;
+
+            if (type === 'ssweb') {
+                const u = document.getElementById('url-ss').value.trim();
                 const d = document.getElementById('device-ss').value;
                 const t = document.getElementById('theme-ss').value;
-                if(!u) return;
+
+                if (!u) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'URL requerida',
+                        text: 'Ingresa la URL del sitio web',
+                        background: 'var(--bg-card)',
+                        color: 'var(--text-primary)',
+                        confirmButtonColor: '#3b82f6'
+                    });
+                    return;
+                }
+
                 finalUrl = `/api/tools/ssweb?url=${encodeURIComponent(u)}&device=${d}&theme=${t}&apiKey=${userData.key}`;
             } else {
-                const txt = document.getElementById('text-qr').value;
-                if(!txt) return;
+                const txt = document.getElementById('text-qr').value.trim();
+
+                if (!txt) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Texto requerido',
+                        text: 'Ingresa el texto o URL para el QR',
+                        background: 'var(--bg-card)',
+                        color: 'var(--text-primary)',
+                        confirmButtonColor: '#3b82f6'
+                    });
+                    return;
+                }
+
                 finalUrl = `/api/tools/qr?text=${encodeURIComponent(txt)}&apiKey=${userData.key}`;
             }
-            Swal.fire({ title: 'Procesando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            Swal.fire({
+                title: 'Procesando...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading(),
+                background: 'var(--bg-card)',
+                color: 'var(--text-primary)'
+            });
+
             imgEl.src = finalUrl;
-            imgEl.onload = () => { imgEl.style.display = 'block'; Swal.close(); };
+            imgEl.onload = () => {
+                imgEl.style.display = 'block';
+                Swal.close();
+            };
+            imgEl.onerror = () => {
+                Swal.close();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudo cargar la imagen',
+                    background: 'var(--bg-card)',
+                    color: 'var(--text-primary)',
+                    confirmButtonColor: '#3b82f6'
+                });
+            };
         }
 
         async function testGacha(action) {
             const resBox = document.getElementById('result-gacha');
             const copyBtn = document.getElementById('copy-gacha');
             let url = '';
-            switch(action) {
-                case 'pull': url = `/api/tools/gacha/pull?apiKey=${userData.key}`; break;
-                case 'multipull': url = `/api/tools/gacha/multipull?apiKey=${userData.key}`; break;
-                case 'characters': url = `/api/tools/gacha/characters?apiKey=${userData.key}`; break;
-                case 'stats': url = `/api/tools/gacha/stats?apiKey=${userData.key}`; break;
+
+            switch (action) {
+                case 'pull':
+                    url = `/api/tools/gacha/pull?apiKey=${userData.key}`;
+                    break;
+                case 'multipull':
+                    url = `/api/tools/gacha/multipull?apiKey=${userData.key}`;
+                    break;
+                case 'characters':
+                    url = `/api/tools/gacha/characters?apiKey=${userData.key}`;
+                    break;
+                case 'stats':
+                    url = `/api/tools/gacha/stats?apiKey=${userData.key}`;
+                    break;
                 case 'search':
                     const search = document.getElementById('search-character').value.trim();
-                    if(!search) return Swal.fire({ icon: 'warning', title: 'Escribe un nombre', background: '#11111d', color: '#fff' });
+                    if (!search) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Escribe un nombre',
+                            text: 'Ingresa el nombre del personaje a buscar',
+                            background: 'var(--bg-card)',
+                            color: 'var(--text-primary)',
+                            confirmButtonColor: '#3b82f6'
+                        });
+                        return;
+                    }
                     url = `/api/tools/gacha/characters?search=${encodeURIComponent(search)}&apiKey=${userData.key}`;
                     break;
             }
+
             resBox.style.display = 'block';
-            resBox.innerText = "CARGANDO...";
+            resBox.innerText = "⏳ Cargando...";
             copyBtn.style.display = 'none';
+
             try {
                 const response = await fetch(url);
                 const data = await response.json();
                 resBox.innerText = JSON.stringify(data, null, 2);
                 copyBtn.style.display = 'block';
             } catch (error) {
-                resBox.innerText = "ERROR AL CARGAR";
+                resBox.innerText = "❌ Error al cargar";
                 copyBtn.style.display = 'block';
             }
         }
 
         function copyResult(id) {
             const text = document.getElementById(`result-${id}`).innerText;
+            if (!text || text.includes("⏳") || text.includes("❌")) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Sin datos',
+                    text: 'Ejecuta una acción primero',
+                    background: 'var(--bg-card)',
+                    color: 'var(--text-primary)',
+                    confirmButtonColor: '#3b82f6'
+                });
+                return;
+            }
             navigator.clipboard.writeText(text);
-            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Copiado', showConfirmButton: false, timer: 1000, background: '#11111d', color: '#fff' });
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: '¡Copiado!',
+                showConfirmButton: false,
+                timer: 1500,
+                background: 'var(--bg-card)',
+                color: 'var(--text-primary)'
+            });
         }
 
-        window.onload = () => { 
-            grecaptcha.ready(() => { 
-                grecaptcha.execute('6Lfw-dwsAAAAACc6y5K4sfFnplSqbskYPia1ADh5', {action: 'tools_test'}); 
+        window.onload = () => {
+            grecaptcha.ready(() => {
+                grecaptcha.execute('6Lfw-dwsAAAAACc6y5K4sfFnplSqbskYPia1ADh5', { action: 'tools_test' });
             });
         };
     </script>
