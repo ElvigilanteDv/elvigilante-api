@@ -736,7 +736,7 @@
         }
 
         function comprarWhatsApp(plan, precio, beneficios) {
-            const mensaje = `Hola, quiero información sobre el plan ${plan} de $${precio} USD. Beneficios: ${beneficios}. Mi usuario es: ${userData.username}. Mi email es: ${userData.email}. Gracias!`;
+            const mensaje = `Hola Edward, quiero información sobre el plan ${plan} de $${precio} USD. Beneficios: ${beneficios}. Mi usuario es: ${userData.username}. Mi email es: ${userData.email}. Gracias!`;
             const url = `https://wa.me/59177474230?text=${encodeURIComponent(mensaje)}`;
             window.open(url, '_blank');
         }
