@@ -152,6 +152,9 @@
             margin-bottom: 12px;
             border: 1px solid rgba(0,0,0,0.02);
             transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
         body.dark-mode .plan-card {
@@ -163,8 +166,45 @@
             border-color: var(--accent);
         }
 
-        .plan-card.admin {
-            background: linear-gradient(135deg, rgba(59,130,246,0.05), rgba(139,92,246,0.05));
+        .plan-card .plan-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            flex-shrink: 0;
+            object-fit: cover;
+        }
+
+        .plan-card .plan-info {
+            flex: 1;
+        }
+
+        .plan-card .plan-info h3 {
+            font-size: 0.95rem;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .plan-card .plan-info p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin: 2px 0 0;
+        }
+
+        .plan-card .plan-info .requests {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .plan-card .plan-price {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .plan-card .plan-price .price {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #22c55e;
         }
 
         header {
@@ -251,6 +291,8 @@
         .badge-premium { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
         .badge-admin { background: linear-gradient(135deg, #ef4444, #dc2626); }
         .badge-free { background: var(--bg-primary); color: var(--text-secondary); }
+        .badge-lite { background: linear-gradient(135deg, #22c55e, #16a34a); }
+        .badge-plus { background: linear-gradient(135deg, #f59e0b, #d97706); }
 
         .stat-box {
             background: var(--bg-primary);
@@ -350,28 +392,6 @@
             color: var(--accent);
         }
 
-        .custom-input {
-            background: var(--bg-primary);
-            border: 1.5px solid transparent;
-            border-radius: 12px;
-            padding: 10px 14px;
-            color: var(--text-primary);
-            font-size: 0.85rem;
-            width: 100%;
-            outline: none;
-            transition: var(--transition);
-            font-family: inherit;
-        }
-
-        .custom-input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
-        }
-
-        .custom-input::placeholder {
-            color: var(--text-muted);
-        }
-
         @media (max-width: 480px) {
             .input-flex {
                 flex-direction: column;
@@ -380,7 +400,17 @@
                 width: 100%;
             }
             .plan-card {
-                padding: 14px 16px;
+                flex-direction: column;
+                text-align: center;
+                padding: 16px;
+            }
+            .plan-card .plan-price {
+                text-align: center;
+                width: 100%;
+            }
+            .plan-card .plan-icon {
+                width: 40px;
+                height: 40px;
             }
         }
     </style>
@@ -431,72 +461,54 @@
                 <i class="fas fa-crown"></i> Mejora tu Plan
             </div>
 
+            <!-- Plan Lite -->
             <div class="plan-card">
-                <div class="flex justify-between items-center flex-wrap gap-2">
-                    <div>
-                        <h3 class="text-lg font-black">💎 VIP</h3>
-                        <p class="text-sm text-[var(--text-secondary)]">1,300 solicitudes / día</p>
-                        <p class="text-xs text-[var(--text-muted)]">⏱️ 33 días de duración</p>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-2xl font-bold text-green-500">$1 USD</div>
-                        <button onclick="comprarWhatsApp('VIP', 1, '1,300 solicitudes por 33 días')" class="btn-whatsapp mt-1">
-                            <i class="fab fa-whatsapp"></i> Comprar
-                        </button>
-                    </div>
+                <img src="https://i.ibb.co/CKXMVLSP/file-000000009b2871f78948a30357c6274b.png" class="plan-icon" alt="Plan Lite">
+                <div class="plan-info">
+                    <h3>Lite</h3>
+                    <p>Ideal para comenzar. 500 solicitudes diarias.</p>
+                    <span class="requests">500 solicitudes / día</span>
+                </div>
+                <div class="plan-price">
+                    <div class="price">$0.50 USD</div>
+                    <button onclick="comprarWhatsApp('Lite', 0.50, '500 solicitudes por 33 días')" class="btn-whatsapp mt-1">
+                        <i class="fab fa-whatsapp"></i> Comprar
+                    </button>
                 </div>
             </div>
 
+            <!-- Plan Plus -->
             <div class="plan-card">
-                <div class="flex justify-between items-center flex-wrap gap-2">
-                    <div>
-                        <h3 class="text-lg font-black">⚡ PRO</h3>
-                        <p class="text-sm text-[var(--text-secondary)]">2,500 solicitudes / día</p>
-                        <p class="text-xs text-[var(--text-muted)]">⏱️ 33 días de duración</p>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-2xl font-bold text-green-500">$2 USD</div>
-                        <button onclick="comprarWhatsApp('PRO', 2, '2,500 solicitudes por 33 días')" class="btn-whatsapp mt-1">
-                            <i class="fab fa-whatsapp"></i> Comprar
-                        </button>
-                    </div>
+                <img src="https://i.ibb.co/WTzWThP/Plan-Plus.png" class="plan-icon" alt="Plan Plus">
+                <div class="plan-info">
+                    <h3>Plus</h3>
+                    <p>Para uso frecuente. 1,000 solicitudes diarias.</p>
+                    <span class="requests">1,000 solicitudes / día</span>
+                </div>
+                <div class="plan-price">
+                    <div class="price">$1 USD</div>
+                    <button onclick="comprarWhatsApp('Plus', 1, '1,000 solicitudes por 33 días')" class="btn-whatsapp mt-1">
+                        <i class="fab fa-whatsapp"></i> Comprar
+                    </button>
                 </div>
             </div>
 
+            <!-- Plan Pro -->
             <div class="plan-card">
-                <div class="flex justify-between items-center flex-wrap gap-2">
-                    <div>
-                        <h3 class="text-lg font-black">👑 PREMIUM</h3>
-                        <p class="text-sm text-[var(--text-secondary)]">400,000 solicitudes / día</p>
-                        <p class="text-xs text-[var(--text-muted)]">⏱️ 50 días de duración</p>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-2xl font-bold text-green-500">$4 USD</div>
-                        <button onclick="comprarWhatsApp('PREMIUM', 4, '400,000 solicitudes por 50 días')" class="btn-whatsapp mt-1">
-                            <i class="fab fa-whatsapp"></i> Comprar
-                        </button>
-                    </div>
+                <img src="https://i.ibb.co/BXNvcG5/Plan-Pro.png" class="plan-icon" alt="Plan Pro">
+                <div class="plan-info">
+                    <h3>Pro</h3>
+                    <p>Para proyectos exigentes. 2,000 solicitudes diarias.</p>
+                    <span class="requests">2,000 solicitudes / día</span>
+                </div>
+                <div class="plan-price">
+                    <div class="price">$2 USD</div>
+                    <button onclick="comprarWhatsApp('Pro', 2, '2,000 solicitudes por 33 días')" class="btn-whatsapp mt-1">
+                        <i class="fab fa-whatsapp"></i> Comprar
+                    </button>
                 </div>
             </div>
 
-            <div class="plan-card admin">
-                <div class="flex justify-between items-center flex-wrap gap-2">
-                    <div>
-                        <h3 class="text-lg font-black">🔥 ADMIN</h3>
-                        <p class="text-sm text-[var(--text-secondary)]">¡Tú eliges la cantidad!</p>
-                        <p class="text-xs text-[var(--text-muted)]">⏱️ 33 días de duración</p>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-2xl font-bold text-green-500">$6 USD</div>
-                        <div class="flex gap-2 mt-1">
-                            <input type="number" id="customLimit" placeholder="Cantidad" min="100" class="custom-input" style="width: 100px;">
-                            <button onclick="comprarWhatsAppAdmin()" class="btn-whatsapp" style="background: linear-gradient(135deg, #8b5cf6, #6366f1);">
-                                <i class="fab fa-whatsapp"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="card p-8 mt-8">
@@ -596,9 +608,10 @@
                     badge.innerText = plan;
 
                     badge.className = 'badge-plan';
-                    if (plan === 'VIP') badge.classList.add('badge-vip');
+                    if (plan === 'VIP' || plan === 'PREMIUM') badge.classList.add('badge-premium');
                     else if (plan === 'PRO') badge.classList.add('badge-pro');
-                    else if (plan === 'PREMIUM') badge.classList.add('badge-premium');
+                    else if (plan === 'PLUS') badge.classList.add('badge-plus');
+                    else if (plan === 'LITE') badge.classList.add('badge-lite');
                     else if (plan === 'ADMIN' || plan === 'ADMIN VIP') badge.classList.add('badge-admin');
                     else badge.classList.add('badge-free');
 
@@ -724,26 +737,6 @@
 
         function comprarWhatsApp(plan, precio, beneficios) {
             const mensaje = `Hola, quiero información sobre el plan ${plan} de $${precio} USD. Beneficios: ${beneficios}. Mi usuario es: ${userData.username}. Mi email es: ${userData.email}. Gracias!`;
-            const url = `https://wa.me/59177474230?text=${encodeURIComponent(mensaje)}`;
-            window.open(url, '_blank');
-        }
-
-        function comprarWhatsAppAdmin() {
-            const customLimit = document.getElementById('customLimit').value;
-
-            if (!customLimit || customLimit < 100) {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Ingresa una cantidad válida (mínimo 100)',
-                    icon: 'error',
-                    background: 'var(--bg-card)',
-                    color: 'var(--text-primary)',
-                    confirmButtonColor: '#3b82f6'
-                });
-                return;
-            }
-
-            const mensaje = `Hola, quiero información sobre el plan ADMIN de $6 USD. Cantidad de solicitudes: ${customLimit}. Mi usuario es: ${userData.username}. Mi email es: ${userData.email}. Gracias!`;
             const url = `https://wa.me/59177474230?text=${encodeURIComponent(mensaje)}`;
             window.open(url, '_blank');
         }
