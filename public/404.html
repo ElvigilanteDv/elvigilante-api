@@ -42,7 +42,6 @@
             overflow: hidden;
         }
 
-        /* Animación de fondo */
         .bg-particles {
             position: fixed;
             top: 0;
@@ -215,7 +214,6 @@
             color: var(--accent);
         }
 
-        /* Theme toggle */
         .theme-toggle {
             position: fixed;
             top: 24px;
@@ -245,7 +243,6 @@
             color: var(--accent);
         }
 
-        /* Responsive */
         @media (max-width: 480px) {
             .error-code {
                 font-size: 5rem;
@@ -275,15 +272,12 @@
 </head>
 <body>
 
-    <!-- Partículas de fondo -->
     <div class="bg-particles" id="particles"></div>
 
-    <!-- Toggle tema -->
     <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn" aria-label="Toggle theme">
         <i class="fas fa-moon"></i>
     </button>
 
-    <!-- Contenido principal -->
     <div class="error-container">
         <div class="brand-icon">
             <i class="fas fa-crown"></i>
@@ -315,7 +309,6 @@
     </footer>
 
     <script>
-        // Generar partículas
         (function createParticles() {
             const container = document.getElementById('particles');
             const count = 50;
@@ -334,7 +327,6 @@
             }
         })();
 
-        // Tema
         function toggleTheme() {
             const body = document.body;
             const btn = document.getElementById('theme-btn');
@@ -351,7 +343,6 @@
             }
         }
 
-        // Cargar tema guardado
         (function initTheme() {
             const saved = localStorage.getItem('kazuma-theme');
             if (saved === 'light') {
